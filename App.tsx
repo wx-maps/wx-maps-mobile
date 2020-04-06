@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Provider as PaperProvider, Text, Button} from 'react-native-paper';
-import { NavigationContainer } from '@react-navigation/native';
+import { Provider as PaperProvider, Text, Button, List} from 'react-native-paper';
+import { NavigationContainer, CommonActions } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { BleManager } from "react-native-ble-plx";
 
@@ -30,7 +30,8 @@ class HomeScreen extends Component {
             return
         }
 
-        console.log(device.name);
+       
+        this.setState({ devices: this.state.devices.concat(device)})
         // Check if it is a device you are looking for based on advertisement data
         // or other criteria.
         if (device.name === 'TI BLE Sensor Tag' || 
@@ -47,7 +48,9 @@ class HomeScreen extends Component {
   render(){
     return(
       <View style={styles.container}>
-        <Text>I'm back!</Text>
+        <Text>Device count: {this.state.devices.length}</Text>
+        {this.state.devices.map((device, i) => { return <BleDevice device={device} key={i} navigation={this.props.navigation}/> })}
+
         <Button
           onPress={() => this.props.navigation.navigate('Details')}
       >Go To Details</Button>
@@ -56,11 +59,33 @@ class HomeScreen extends Component {
   }
 }
 
-class DetailsScreen extends Component {
+class BleDevice extends Component {
   render(){
     return(
+        <List.Item 
+          title={this.props.device.name} 
+          key={this.props.i} 
+          description={this.props.device.id} 
+          style={{width: '80%'}} 
+          onPress={() => { this.props.navigation.navigate('Details', { device: this.props.device })}}
+        />
+    )
+  }
+}
+
+class DetailsScreen extends Component {
+  constructor(){
+    super();
+
+  }
+  render(){
+    const {device} = this.props.route.params;
+
+    return(
       <View style={styles.container}>
-        <Text>Details!</Text>
+        <Text>Details for {device.name}!</Text>
+        <Text>{device.rssi}</Text>
+        <Text>{device.id}</Text>
         <Button onPress={() => this.props.navigation.navigate('Home')} >Go Home</Button>
       </View>
     )
