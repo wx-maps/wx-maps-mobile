@@ -1,69 +1,59 @@
 import React, { Component } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { Buffer } from 'buffer'
 import { Provider as PaperProvider, Text, Button, List, Snackbar } from 'react-native-paper';
 import { NavigationContainer, CommonActions } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 import { BleManager } from "react-native-ble-plx";
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+
+
+// Screens
+import { MapStatusScreen } from './screens/MapStatusScreen'
+
+import { Base } from './styles'
 
 
 class HomeScreen extends Component {
-  constructor() {
-    super();
+  manager: BleManager;
+  wifiService: string;
+  mapService: string;
+
+
+  constructor(props) {
+    super(props);
     this.manager = new BleManager();
+    this.wifiService = 'ed6695dd-be8a-44d6-a11d-cb3348faa85a';
+    this.mapService = 'a5023bbe-29f9-4385-ab43-a9b3600ab7c4';
+
     this.state = { 
       devices: [],
       info: ''
     }
 
-    
-    this.scanServiceUUID = 'ed6695ddbe8a44d6a11dcb3348faa85a';
   }
+  componentWillUnmount(){
+    const connectedDevices = this.manager.connectedDevices().then((UUIDS) => { UUIDS.map((UUID) => { this.manager.cancelDeviceConnection(UUID)}) })
+  }
+
   componentDidMount() {
     this.manager.onStateChange((state) => {
       if (state === 'PoweredOn') {
-          this.scanAndConnect();
+          this.scan();
       }
     }, true);
   }
   
-  scanAndConnect() {
-    this.manager.startDeviceScan(null, null, (error, device) => {
-        console.log("Scanning...")
-        console.log(device)
+  scan(){
+    this.manager.startDeviceScan([this.mapService], null, (error, device) => {
+      console.log("Scanning...")
+      
+      if (error) {
+        console.log(error.message)
+        return
+      }
 
-        if (error) {
-          console.log(error.message)
-          return
-        }
-
-        if (device.name === 'WX Maps' || device.name === 'WXMaps' || device.localName === 'WXMaps' || device.localName === 'WXMap') {
-          console.log("Connecting to map")
-          this.manager.stopDeviceScan()
-          device.connect()
-          .then((device) => {
-            console.log("Discovering services and characteristics")
-            return device.discoverAllServicesAndCharacteristics()
-          })
-          .then((device) => {
-            console.log("Setting notifications")
-            return this.subscribe(device)
-          })
-          .then(() => {
-            console.log("Listening...")
-          }, (error) => {
-            console.log(error.message)
-          })
-        }
-      });
-  };
-  
-  async subscribe(device){
-    const service = 'ed6695dd-be8a-44d6-a11d-cb3348faa85a';
-    const scanCharacteristic = 'fe600987-e2ea-4c16-b938-f5d04e904af2'
-    this.setState({status: "writing..."})
-
-    const characteristic = await device.writeCharacteristicWithResponseForService(service, scanCharacteristic, "SGkgU3RlcGhhbmllIQ==");
-    device.cancelConnection();
+      this.setState({ devices: this.state.devices.concat(device)}) ;
+    })
   }
   
   render(){
@@ -95,12 +85,23 @@ class BleDevice extends Component {
 }
 
 class DetailsScreen extends Component {
+  params: any;
+  device: any;
+  manager: any;
+  wifiService: string;
+  scanCharacteristic: string;
+  dataBuffer: never[];
+
   constructor(props){
     super(props);
 
     this.params = this.props.route.params;
     this.device = this.params.device;
     this.manager = this.params.manager;
+    this.dataBuffer = [];
+
+    this.wifiService = 'ed6695dd-be8a-44d6-a11d-cb3348faa85a';
+    this.scanCharacteristic = 'fe600987-e2ea-4c16-b938-f5d04e904af2'
 
 
     this.state = { 
@@ -108,7 +109,7 @@ class DetailsScreen extends Component {
       characteristics: [],
       status: 'empty',
       services: [],
-      device: this.params.device
+      wifiNetworks: []
     }    
   }
   
@@ -122,39 +123,70 @@ class DetailsScreen extends Component {
   }
   
 connect(){
-    this.manager.stopDeviceScan();
+    this.stopScan();
 
     this.device.connect()
     .then((device) => {
       this.setState({status: "Connected...discovering"})
-      
-      return device.discoverAllServicesAndCharacteristics()
+      return this.discover();
     })
     .then((device) => {
-      this.setState({
-        status: "Discovered...services",
-        device: device
-      })
-      console.log(this.state.device.serviceUUIDs);
-      console.log(this.state.device.serviceUUIDs);
-
-      this.subscribe();
-      
+      return this.subscribe();
     }, (error) => {
       this.setState({status: error.message})
     })
     .catch((error) => {
+      this.device.cancelConnection();
       console.log(error)
     })
   }
 
-  async subscribe(device){
-    const service = 'ed6695dd-be8a-44d6-a11d-cb3348faa85a';
-    const scanCharacteristic = 'fe600987-e2ea-4c16-b938-f5d04e904af2'
+  stopScan(){
+    this.manager.stopDeviceScan();
+  }
+
+  discover(){
+    return this.device.discoverAllServicesAndCharacteristics()
+  }
+
+  // Bluetooth helpers
+  encode(data: string){
+    return new Buffer(data).toString('base64');
+  }
+
+  decode(data: string){
+    return new Buffer(data, 'base64').toString('utf8');
+  }
+  
+  reconstructData(){
+    let joined = this.dataBuffer.join('')
+    console.log(joined)
+    return JSON.parse(this.dataBuffer.join(''))
+  }
+
+  // End bluetooth helpers
+
+  async scanWifi(){
+    this.setState({status: "Discovered...services"})
     this.setState({status: "writing..."})
 
-    const characteristic = await this.state.device.writeCharacteristicWithResponseForService(service, scanCharacteristic, "0x01")
-    this.state.device.cancelConnection();
+    const characteristic = await this.device.writeCharacteristicWithResponseForService(this.wifiService, this.scanCharacteristic, this.encode("1"))
+  }
+
+  subscribe(){
+    this.device.monitorCharacteristicForService(this.wifiService, this.scanCharacteristic, (error, characteristic) => { 
+      if(characteristic && !error) { 
+        const data = this.decode(characteristic.value);
+
+        if(data.slice(-1) == "\0"){
+          this.dataBuffer.push(data.slice(0, -1));
+          this.setState({ wifiNetworks: this.reconstructData()});
+          console.log(this.data)
+        }else{
+          this.dataBuffer.push(data);
+        }
+      }
+   })
   }
   
   render(){
@@ -164,35 +196,40 @@ connect(){
         <Text>{this.device.rssi}</Text>
         <Text>{this.device.id}</Text>
         <Text>{this.state.status}</Text>
-        <Text>{JSON.stringify(this.state.services)}</Text>
+        {this.state.wifiNetworks.map((wifiNetwork, i) => { return <Text key={i}>{wifiNetwork.ssid}</Text> })}
+
+        <Button onPress={() => this.scanWifi() } >Start Scan</Button>
+
         <Button onPress={() => this.props.navigation.navigate('Home')} >Go Home</Button>
       </View>
     )
   }
 }
 
-
-const Stack = createStackNavigator();
+const Tab = createMaterialBottomTabNavigator();
 
 export default class App extends Component {
+  constructor(props){
+    super(props)
+    console.log("Welcome!")
+    this.manager = new BleManager();
+
+  }
   render() {
     return(
       <PaperProvider>
         <NavigationContainer>
-          <Stack.Navigator>
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="Details" component={DetailsScreen} />
-          </Stack.Navigator>
+          <Tab.Navigator>
+            <Tab.Screen name="Home" component={HomeScreen} />
+            <Tab.Screen name="Details" component={DetailsScreen} />
+            <Tab.Screen name="Map Status" component={MapStatusScreen} />
+          </Tab.Navigator>
         </NavigationContainer>
       </PaperProvider>
     )
   }
 }
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  container: { ...Base.container }
 });

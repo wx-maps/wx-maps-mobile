@@ -37,12 +37,12 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Allow WXMaps to use Bluetooth</string>
 	<key>NSCalendarsUsageDescription</key>
 	<string>Allow WXMaps to access your calendar</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Allow WXMaps to use the camera</string>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>Allow WXMaps to use Bluetooth</string>
 	<key>NSContactsUsageDescription</key>
 	<string>Allow WXMaps experiences to access your contacts</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
@@ -54,7 +54,7 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allow WXMaps to access your microphone</string>
 	<key>NSMotionUsageDescription</key>
-	<string>Allow WXMaps to access your device&apos;s accelerometer</string>
+	<string>Allow WXMaps to access your device's accelerometer</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Give WXMaps periences permission to save photos</string>
 	<key>NSPhotoLibraryUsageDescription</key>
@@ -64,6 +64,9 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>bluetooth-central</string>
+		<string>fetch</string>
+		<string>processing</string>
+		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
