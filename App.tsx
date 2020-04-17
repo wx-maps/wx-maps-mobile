@@ -13,9 +13,9 @@ import BLEReducer from './reducers/BLEReducer';
 import thunk from 'redux-thunk';
 
 // Screens
-import { MapStatusScreen } from './screens/MapStatusScreen';
+import MapStatusScreen from './screens/MapStatusScreen';
 import HomeScreen from './screens/HomeScreen';
-import { DetailsScreen } from './screens/DetailsScreen';
+import DetailsScreen from './screens/DetailsScreen';
 
 // CSS
 import { Base } from './styles'
@@ -30,9 +30,8 @@ export default class App extends Component {
   constructor(props){
     super(props)
     console.log("Welcome!")
-    this.manager = new BleManager();
-
   }
+  
   render() {
     return(
       <StoreProvider store={store}>

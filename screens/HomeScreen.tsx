@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 
 import { View, StyleSheet } from 'react-native';
-import { Text, Button, List } from 'react-native-paper';
+import { Text, Button, List, Snackbar } from 'react-native-paper';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { addDevice, startScan } from '../actions/BLEActions';
+import { addDevice, startScan, scanWifi, disconnectDevices } from '../actions/BLEActions';
 
 import { Base } from '../styles'
 
@@ -13,30 +13,22 @@ class HomeScreen extends Component {
         super(props)
         this.props.startScan();
     }
-  componentWillUnmount() {
-    // const connectedDevices = this.manager.connectedDevices().then((UUIDS) => { UUIDS.map((UUID) => { this.manager.cancelDeviceConnection(UUID); }); });
-  }
 
-  componentDidMount() {
-    // this.manager.onStateChange((state) => {
-    //   if (state === 'PoweredOn') {
-    //     this.scan();
-    //   }
-    // }, true);
-  }
+    componentWillUnmount() {
+        this.props.disconnectDevices()
+    }
 
+    render() {
+        return (<View style={styles.container}>
+        <Text>Device count: {this.props.BLE.devices.length}</Text>
+        {this.props.BLE.devices.map((device, i) => { return <BleDevice device={device} key={i} navigation={this.props.navigation} manager={this.manager} />; })}
 
+        <Button onPress={() => this.props.navigation.navigate('Details')}>Go To Details</Button>
+        <Snackbar visible={this.props.BLE.snackBarVisible}>{this.props.BLE.snackBarText}</Snackbar>
+        <Button onPress={() => this.props.scanWifi()}>Go To Details</Button>
 
-  render() {
-    return (<View style={styles.container}>
-      <Text>Device count: {this.props.BLE.devices.length}</Text>
-      {this.props.BLE.devices.map((device, i) => { return <BleDevice device={device} key={i} navigation={this.props.navigation} manager={this.manager} />; })}
-
-      <Button onPress={() => this.props.navigation.navigate('Details')}>Go To Details</Button>
-    </View>);
-  }
-
-
+        </View>);
+    }
 }
 
 const styles = StyleSheet.create({
@@ -57,21 +49,23 @@ class BleDevice extends Component {
     }
   }
 
-function mapStateToProps(state){
-    const { BLE } = state
-    console.log("State is : " + state)
-    return { BLE }
-};
-
-// const mapDispatchToProps = dispatch => (
+  // const mapDispatchToProps = dispatch => (
 //     bindActionCreators({
 //         addDevice,
 //         // startScan: () => dispatch(startScan())
 //     }, dispatch)
 // );
+
+function mapStateToProps(state){
+    const { BLE } = state
+    return { BLE }
+};
+
 const mapDispatchToProps = dispatch => ({
     addDevice,
-    startScan: () => dispatch(startScan())
+    startScan: () => dispatch(startScan()),
+    disconnectDevices: () => dispatch(disconnectDevices()),
+    scanWifi: () => dispatch(scanWifi())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
