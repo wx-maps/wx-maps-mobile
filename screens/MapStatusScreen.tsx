@@ -8,14 +8,31 @@ import { Base } from '../styles'
 
 
 class MapStatusScreen extends Component{
+    connected(){
+        console.log("status")
+        console.log(this.props.BLE.connectedDevice === null)
+        return (this.props.BLE.connectedDevice === null) ? "No" : "Yes"
+    }
     render(){
         return(
             <View style={styles.container}>
                 <Text>Map Status Screen</Text>
+                <Text>Connected: {this.connected()}</Text>
+                <DeviceInfo device={this.props.BLE.device}></DeviceInfo>
             </View>
         )
     }
 }
+
+class DeviceInfo extends Component {
+    render(){
+        return(
+            <Text>Connected Device: { this.props.device && this.props.device.name }</Text>
+
+        )
+    }
+}
+
 
 const styles = StyleSheet.create({
     container: { ...Base.container }

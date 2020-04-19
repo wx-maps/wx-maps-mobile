@@ -33,34 +33,6 @@ class DetailsScreen extends Component {
     };
   }
 
-  componentDidMount() {
-    this.connect();
-  }
-
-  componentWillUnmount() {
-    console.log("Disconnecting");
-    // this.device.cancelConnection();
-  }
-
-  connect() {
-    // this.stopScan();
-    // this.device.connect()
-    //   .then((device) => {
-    //     this.setState({ status: "Connected...discovering" });
-    //     return this.discover();
-    //   })
-    //   .then((device) => {
-    //     return this.subscribe();
-    //   }, (error) => {
-    //     this.setState({ status: error.message });
-    //   })
-    //   .catch((error) => {
-    //     this.device.cancelConnection();
-    //     console.log(error);
-    //   });
-  }
-
-
   // Bluetooth helpers
   encode(data: string) {
     return new Buffer(data).toString('base64');
@@ -84,22 +56,6 @@ class DetailsScreen extends Component {
     this.setState({ status: "writing..." });
     const characteristic = await this.device.writeCharacteristicWithResponseForService(this.wifiService, this.scanCharacteristic, this.encode("1"));
   }
-
-  // subscribe() {
-  //   this.device.monitorCharacteristicForService(this.wifiService, this.scanCharacteristic, (error, characteristic) => {
-  //     if (characteristic && !error) {
-  //       const data = this.decode(characteristic.value);
-  //       if (data.slice(-1) == "\0") {
-  //         this.dataBuffer.push(data.slice(0, -1));
-  //         this.setState({ wifiNetworks: this.reconstructData() });
-  //         console.log(this.data);
-  //       }
-  //       else {
-  //         this.dataBuffer.push(data);
-  //       }
-  //     }
-  //   });
-  // }
   
   render() {
     const networks = this.props.BLE.wifiNetworks.map((wifiNetwork, i) => { return <Text key={i}>{wifiNetwork.ssid}</Text>; })

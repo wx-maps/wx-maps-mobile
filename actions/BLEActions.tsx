@@ -1,4 +1,7 @@
 import { Buffer } from 'buffer';
+// import {WIFI_SERVICE, MAP_SERVICE, SCAN_CHARCTERISTIC } from '../lib/BLE'
+import * as BLE from '../lib/BLE'
+
 
 export const ADD_DEVICE = 'ADD_DEVICE'
 export const CONNECTED_DEVICE = 'CONNECTED_DEVICE'
@@ -41,7 +44,7 @@ export const scanWifi = (device) => {
         // console.log(encode("1"))
         // console.log(device.characteristics)
 
-        await device.writeCharacteristicWithResponseForService(getState().BLE.wifiService, getState().BLE.scanCharacteristic, encode("1"))
+        await device.writeCharacteristicWithResponseForService(BLE.WIFI_SERVICE, BLE.SCAN_CHARCTERISTIC, encode("1"))
     }
 }
     
@@ -59,7 +62,7 @@ export const startScan = () => {
 
 export const scan = () => {
     return (dispatch, getState, BLEManager) => {
-        BLEManager.startDeviceScan([getState().BLE.mapService], null, (error, device) => {
+        BLEManager.startDeviceScan([BLE.MAP_SERVICE], null, (error, device) => {
             
             if (error) { console.log(error.message); }
             
@@ -83,12 +86,12 @@ export const connectTo = (device) => {
           })
           .then((device) => {
                 console.log('Subscribing')
-                
-                device.monitorCharacteristicForService(getState().BLE.wifiService, getState().BLE.scanCharacteristic, (error, characteristic) => {
+
+
+                // FIXME - Break out subscriptions
+                device.monitorCharacteristicForService(BLE.WIFI_SERVICE, BLE.SCAN_CHARCTERISTIC, (error, characteristic) => {
                     if (characteristic && !error) {
-                        let dataBuffer = [];
                         const data = decode(characteristic.value);
-                        console.log(data)
                         if (data.slice(-1) == "\0") {
                             dispatch(addWifiData(data.slice(0, -1)));
                             dispatch(reconstructData())
