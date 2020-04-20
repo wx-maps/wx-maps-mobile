@@ -1,18 +1,20 @@
-import { combineReducers } from 'redux';
+// import { combineReducers } from 'redux';
 
-import { ADD_DEVICE, CONNECTED_DEVICE, ADD_WIFI_DATA, RECONSTRUCT_DATA } from '../actions/BLEActions'
+import { ADD_DEVICE, CONNECTED_DEVICE, ADD_WIFI_DATA, RECONSTRUCT_DATA, SET_IP_ADDRESS, SET_INTERNET_CONNECTION_STATUS } from '../actions/BLEActions'
 
 const INITIAL_STATE = {
   manager: null,
   devices: [],
-  snackBarVisible: false,
-  snackBarText: null,
   wifiDataBuffer: [],
   wifiNetworks: [],
   connectedDevice: null,
+  wifi: { 
+    connectedToInternet: false,
+    ipAddress: null
+  }
 };
 
-const BLEReducer = (state = INITIAL_STATE, action) => {
+export const BLEReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case ADD_DEVICE:
       return {...state, devices: state.devices.concat(action.payload)}
@@ -22,12 +24,12 @@ const BLEReducer = (state = INITIAL_STATE, action) => {
       let wifiNetworkData = JSON.parse(state.wifiDataBuffer.join(''))
       return {...state, wifiNetworks: wifiNetworkData }
     case CONNECTED_DEVICE:
-      return {...state, connectedDevice: action.payload, snackBarVisible: true, snackBarText: "Connected to device " + action.payload.name + "\n(" + action.payload.id + ')'}
+      return {...state, connectedDevice: action.payload}
+    case SET_IP_ADDRESS:
+        return {...state, wifi: { ...state.wifi, ipAddress: action.payload}}
+    case SET_INTERNET_CONNECTION_STATUS:
+          return {...state, wifi: { ...state.wifi, connectedToInternet: action.payload } }
     default:
       return state
   }
 };
-  
-export default combineReducers({
-  BLE: BLEReducer,
-});

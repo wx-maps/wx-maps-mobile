@@ -4,7 +4,8 @@ import { View, StyleSheet } from 'react-native';
 import { Text, Button, List, Snackbar } from 'react-native-paper';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { addDevice, startScan, scanWifi, disconnectDevices } from '../actions/BLEActions';
+import { startScan, scanWifi, disconnectDevices } from '../actions/BLEActions';
+import {hideSnackbar} from '../actions/AppActions'
 
 import { Base } from '../styles'
 require("json-circular-stringify");
@@ -20,13 +21,14 @@ class HomeScreen extends Component {
     }
 
     render() {
+        // console.log(this.props)
         return (<View style={styles.container}>
         <Text>Device count: {this.props.BLE.devices.length}</Text>
         {this.props.BLE.devices.map((device, i) => { return <BleDevice device={device} key={i} navigation={this.props.navigation} manager={this.manager} />; })}
         <Text>Connected Device: { this.props.BLE.connectedDevice && this.props.BLE.connectedDevice.name }</Text>
 
         <Button onPress={() => this.props.navigation.navigate('Details')}>Go To Details</Button>
-        <Snackbar visible={this.props.BLE.snackBarVisible} onDismiss={() => {return true}}>{this.props.BLE.snackBarText}</Snackbar>
+        <Snackbar visible={this.props.App.snackBarVisible} duration={3000} onDismiss={() => { this.props.hideSnackbar() } }>{this.props.App.snackBarText}</Snackbar>
         <Button onPress={() => this.props.scanWifi()}>Scan</Button>
 
         </View>);
@@ -45,7 +47,7 @@ class BleDevice extends Component {
             key={this.props.i} 
             description={this.props.device.id} 
             style={{width: '80%'}} 
-            onPress={() => { this.props.navigation.navigate('Details', { device: this.props.device, manager: this.props.manager })}}
+            onPress={() => { this.props.navigation.navigate('Details')}}
           />
       )
     }
@@ -59,15 +61,15 @@ class BleDevice extends Component {
 // );
 
 function mapStateToProps(state){
-    const { BLE } = state
-    return { BLE }
+    const { BLE, App } = state
+    return { BLE, App }
 };
 
 const mapDispatchToProps = dispatch => ({
-    addDevice,
+    hideSnackbar: () => dispatch(hideSnackbar()),
     startScan: () => dispatch(startScan()),
     disconnectDevices: () => dispatch(disconnectDevices()),
-    scanWifi: () => dispatch(scanWifi())
+    scanWifi: () => dispatch(scanWifi()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);

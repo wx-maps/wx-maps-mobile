@@ -9,16 +9,18 @@ import { Base } from '../styles'
 
 class MapStatusScreen extends Component{
     connected(){
-        console.log("status")
-        console.log(this.props.BLE.connectedDevice === null)
         return (this.props.BLE.connectedDevice === null) ? "No" : "Yes"
     }
+
     render(){
+        // console.log(this.props)
+
         return(
             <View style={styles.container}>
                 <Text>Map Status Screen</Text>
                 <Text>Connected: {this.connected()}</Text>
-                <DeviceInfo device={this.props.BLE.device}></DeviceInfo>
+                <DeviceInfo connectedDevice={this.props.BLE.connectedDevice} />
+                <WifiInfo wifi={this.props.BLE.wifi} />
             </View>
         )
     }
@@ -26,9 +28,31 @@ class MapStatusScreen extends Component{
 
 class DeviceInfo extends Component {
     render(){
+        // if(!this.props.connectedDevice) { return}
         return(
-            <Text>Connected Device: { this.props.device && this.props.device.name }</Text>
+            <View style={styles.container}>
+                <Text>Connected Device:</Text>
+                <Text>Name: {this.props.connectedDevice.name } </Text>
+                <Text>ID: { this.props.connectedDevice.id }</Text>
+                <Text>RSSI: { this.props.connectedDevice.rssi }</Text>
+            </View>
+        )
+    }
+}
 
+class WifiInfo extends Component {
+    isConnectedToInternet(){
+        return this.props.wifi.connectedToInternet == 'true' ? 'Yes' : 'No'
+    }
+    
+
+    render(){
+        console.log(this.props);
+        return(
+            <View style={styles.container}>
+                <Text>Connected to Internet: {this.isConnectedToInternet()}</Text>
+                <Text>IP: {this.props.wifi.ipAddress}</Text> 
+            </View>
         )
     }
 }
