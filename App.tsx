@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { StyleSheet } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { NavigationContainer, CommonActions } from '@react-navigation/native';
 import { BleManager } from "react-native-ble-plx";
@@ -16,6 +15,9 @@ import thunk from 'redux-thunk';
 import MapStatusScreen from './screens/MapStatusScreen';
 import HomeScreen from './screens/HomeScreen';
 import DetailsScreen from './screens/DetailsScreen';
+
+//
+import * as Styles from './styles'
 
 
 const BLEManager = new BleManager();
@@ -35,10 +37,13 @@ export default class App extends Component {
       <StoreProvider store={store}>
         <PaperProvider>
           <NavigationContainer>        
-            <Tab.Navigator>
-              <Tab.Screen name="Home" component={HomeScreen} />
-              <Tab.Screen name="Details" component={DetailsScreen} />
-              <Tab.Screen name="Map Status" component={MapStatusScreen} />
+            <Tab.Navigator
+              barStyle={
+                Styles.Colors.barColor
+              }
+            >
+              <Tab.Screen name="Map Status" component={HomeScreen} />
+              <Tab.Screen name="Connection Status" component={MapStatusScreen} />
             </Tab.Navigator>
           </NavigationContainer>
         </PaperProvider>
