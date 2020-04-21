@@ -173,7 +173,6 @@ const readInternetStatus = (device) => {
         device.readCharacteristicForService(BLE.WIFI_SERVICE, BLE.CONNECTED_TO_INTERNET_CHARACTERISTIC)
         .then((data) => {
             dispatch(setInternetConnectionStatus(decode(data.value)))
-            console.log(data.value)
         })
     }
 }

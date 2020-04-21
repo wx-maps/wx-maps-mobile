@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet } from 'react-native';
-import { Provider as PaperProvider, Snackbar } from 'react-native-paper';
+import { Provider as PaperProvider } from 'react-native-paper';
 import { NavigationContainer, CommonActions } from '@react-navigation/native';
 import { BleManager } from "react-native-ble-plx";
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
@@ -17,8 +17,6 @@ import MapStatusScreen from './screens/MapStatusScreen';
 import HomeScreen from './screens/HomeScreen';
 import DetailsScreen from './screens/DetailsScreen';
 
-// CSS
-import { Base } from './styles'
 
 const BLEManager = new BleManager();
 
@@ -49,6 +47,3 @@ export default class App extends Component {
   }
 }
 
-export const styles = StyleSheet.create({
-  container: { ...Base.container }
-});
