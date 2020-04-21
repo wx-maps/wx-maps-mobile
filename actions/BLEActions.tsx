@@ -153,10 +153,11 @@ function decode(data: string) {
     return new Buffer(data, 'base64').toString('utf8');
 }
 
+// FIXME: This doesn't appear to do anything...?
 function updateRSSI(device){
-    // device.readRSSI().then(
-    //     setTimeout(updateRSSI, 3000, device)
-    // )
+    device.readRSSI().then(
+        setTimeout(updateRSSI, 3000, device)
+    )
 }
 
 const readIPAddress = (device) => {

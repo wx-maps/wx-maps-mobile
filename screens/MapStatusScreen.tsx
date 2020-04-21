@@ -26,6 +26,7 @@ class MapStatusScreen extends Component{
         if(!this.isConnected()) { return 'Disconnected' }
 
         return this.props.BLE.connectedDevice.id
+        // return 'blah'
     }
 
     // FIXME:Why does connectedDevice not show this but devices[0] does?
@@ -50,42 +51,46 @@ class MapStatusScreen extends Component{
     render(){
         return(
             <SafeAreaView style={{borderColor: 'black', borderWidth: 2, flex: 1}}>
-                <ScrollView style={styles.flexContainer}>                        
-                        {/* <RowContainer> */}
+                <View style={styles.flexContainer}>
+                    <ScrollView>                        
+                        <RowContainer>
                             <StatusBox  itemName='Bluetooth' itemValue={this.connected()} />
-                            <StatusBox  itemName='Device Name' itemValue={this.deviceName()} />
-                        {/* </RowContainer>  
-                        <RowContainer> */}
-                            <StatusBox  itemName='Device ID' itemValue={this.deviceID()} />                            
-                        {/* </RowContainer>
-                        <RowContainer> */}
-                            <StatusBox  itemName='RSSI' itemValue={this.deviceRSSI()} />
                             <StatusBox  itemName='Internet' itemValue={this.isConnectedToInternet()} />
-                        {/* </RowContainer>
-                        <RowContainer> */}
+
+                        </RowContainer>  
+                        <RowContainer>
                             <StatusBox  itemName='IP Address' itemValue={this.ipAddress()} />
+                            <StatusBox  itemName='Device Name' itemValue={this.deviceName()} />
+
+                        </RowContainer>
+                        <RowContainer>
+                        <StatusBox  itemName='Device ID' itemValue={this.deviceID()} />                            
+
+                        </RowContainer>
+                        <RowContainer>
+                        <StatusBox  itemName='RSSI' itemValue={this.deviceRSSI()} />
+
                             <StatusBox  itemName='Internet' itemValue={this.isConnectedToInternet()} />
-                        {/* </RowContainer> */}
+                        </RowContainer>
                 
-                </ScrollView>
+                    </ScrollView>
+                </View>
             </SafeAreaView>
         )
     }
 }
 
 const styles = StyleSheet.create({
-    flexContainer: { flexDirection: "row", flex: 1,},
     rowContainer: { flexDirection: 'row', flex: 2, justifyContent: 'space-between'},
-    statusBox: {flex: 1, padding: 20, borderColor: 'black', textAlign: 'center', borderWidth: 0, margin: 5, marginLeft: 10},
+    flexContainer: { flexDirection: "column", flex: 1, },
+    statusBox: {flex: 1, padding: 10, margin: 5, borderColor: 'black', textAlign: 'center', borderWidth: 0},
     cardContent: {paddingHorizontal: 5, paddingVertical: 5, textAlign: 'center'},
-    centered: {textAlign: 'center'}
-
-
+    centered: {textAlign: 'center'},
+    success: {color: 'green'}
 });
 
 class RowContainer extends Component {
     render(){
-
         return(
             <View style={styles.rowContainer}>{this.props.children}</View>
         )
@@ -95,7 +100,6 @@ class RowContainer extends Component {
 
 class StatusBox extends Component {
     render() {
-
         return(
             <Card style={styles.statusBox}>
                 <Card.Content style={styles.cardContent}>
@@ -106,28 +110,6 @@ class StatusBox extends Component {
         )
     }
 }
-
-
-
-class WifiInfo extends Component {
-    isConnectedToInternet(){
-        return this.props.wifi.connectedToInternet == 'true' ? 'Connected' : 'Disconnected'
-    }
-    
-
-    render(){
-        return(
-            <Text>
-                <Text>{this.isConnectedToInternet() + "\n"}</Text>
-                <Text>IP: {this.props.wifi.ipAddress}</Text> 
-            </Text>
-        )
-    }
-}
-
-
-
-
 
 
 function mapStateToProps(state){
