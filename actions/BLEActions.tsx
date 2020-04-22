@@ -11,8 +11,14 @@ export const CLEAR_WIFI_DATA = 'CLEAR_WIFI_DATA'
 export const RECONSTRUCT_DATA = 'RECONSTRUCT_DATA'
 export const SET_IP_ADDRESS = 'SET_IP_ADDRESS'
 export const SET_INTERNET_CONNECTION_STATUS = 'SET_INTERNET_CONNECTION_STATUS'
+export const SHOW_CONNECT_DIALOG = 'SHOW_CONNECT_DIALOG'
+export const HIDE_CONNECT_DIALOG = 'HIDE_CONNECT_DIALOG'
 
-
+/*
+ *
+ * Tradition Actions
+ * 
+ */
 export const addDevice = device => (
     {
         type: ADD_DEVICE,
@@ -56,6 +62,25 @@ export const setIPAddress = (value) => (
     }
 )
 
+export const showConnectDialog = (network) => (
+    {
+        type: SHOW_CONNECT_DIALOG,
+        payload: network,
+    }
+)
+
+export const hideConnectDialog = () => (
+    {
+        type: HIDE_CONNECT_DIALOG,
+        payload: null,
+    }
+)
+
+/*
+ *
+ * Thunk Actions
+ * 
+ */
 export const setInternetConnectionStatus = (value) => (
     {
         type: SET_INTERNET_CONNECTION_STATUS,
@@ -142,12 +167,15 @@ export const connectTo = (device) => {
 }
 
 export const connectToWifi = (details) => {
-    return async (_dispatch, getState, BLEManager) => {
-        console.log(details);
-        await getState().BLE.connectedDevice.writeCharacteristicWithResponseForService(BLE.WIFI_SERVICE, BLE.CONNECTION_CHARACTERISTIC, encode(JSON.stringify(details))).then(
+    return async (dispatch, getState, BLEManager) => {
+        await getState().BLE.connectedDevice.writeCharacteristicWithResponseForService(BLE.WIFI_SERVICE, BLE.CONNECTION_CHARACTERISTIC, encode(JSON.stringify(details))).then( () => {
             console.log('Done!')
-        )
-        // BLEManager.connectedDevices().then((UUIDS) => { UUIDS.map((UUID) => { BLEManager.cancelDeviceConnection(UUID); }); });
+            dispatch(hideConnectDialog())
+        })
+        // TODO:
+        // dispatch CONNECTING_TO_WIFI
+        
+        
     }
 }
 
@@ -158,6 +186,7 @@ export const disconnectDevices = () => {
 }
 
 // Bluetooth helpers
+//   These have to go somewhere
 function encode(data: string) {
     return new Buffer(data).toString('base64');
 }
