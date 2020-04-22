@@ -38,7 +38,13 @@ export const BLEReducer = (state = INITIAL_STATE, action) => {
       return {...state, wifiDataBuffer: [], wifiNetworkData: []}
     case RECONSTRUCT_DATA:
       let wifiNetworkData = state.wifiDataBuffer.join('');
-      return {...state, wifiNetworks: JSON.parse(wifiNetworkData) }
+      try{  
+        return {...state, wifiNetworks:  JSON.parse(wifiNetworkData) }
+      } catch {
+        console.log('Failed to parse state:')
+        console.log(wifiNetworkData)
+        return {...state}
+      }
     case CONNECTED_DEVICE:
       return {...state, connectedDevice: action.payload}
     case SET_IP_ADDRESS:

@@ -19,8 +19,9 @@ class MapStatusScreen extends Component{
                         <DeviceID connectedDevice={ this.props.BLE.connectedDevice } />
                         <DeviceRSSI connectedDevice={ this.props.BLE.devices[0] } />
                         <InternetStatus wifiInfo={this.props.BLE.wifi} renderIfDisconnected={true} />
-                        <ConfigureWifi connectedDevice={this.props.BLE.connectedDevice} navigation={this.props.navigation}/>
                         <IPStatus wifiInfo={this.props.BLE.wifi} />
+                        <ConfigureWifi connectedDevice={this.props.BLE.connectedDevice} navigation={this.props.navigation} style={{marginTop: 'auto'}} />
+
                     </View>
                 </ScrollView>
             </SafeAreaView>
