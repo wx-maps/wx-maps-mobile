@@ -50,6 +50,7 @@ class ConfigureWifiScreen extends Component {
               <Dialog.Title>Connect to {this.props.BLE.wifi.selectedWifiNetwork.ssid}</Dialog.Title>
               <Dialog.Content>
                 <TextInput label='Password' mode='outlined' onChangeText={ text => this.setState({ wifiPassword: text }) }/>
+                { /* Deal with unhandled promise */ }
               </Dialog.Content>
               <Dialog.Actions>
                 <Button onPress={this.props.hideConnectDialog}>Cancel</Button>
