@@ -7,6 +7,7 @@ import * as App from './AppActions'
 export const ADD_DEVICE = 'ADD_DEVICE'
 export const CONNECTED_DEVICE = 'CONNECTED_DEVICE'
 export const ADD_WIFI_DATA = 'ADD_WIFI_DATA'
+export const CLEAR_WIFI_DATA = 'CLEAR_WIFI_DATA'
 export const RECONSTRUCT_DATA = 'RECONSTRUCT_DATA'
 export const SET_IP_ADDRESS = 'SET_IP_ADDRESS'
 export const SET_INTERNET_CONNECTION_STATUS = 'SET_INTERNET_CONNECTION_STATUS'
@@ -20,10 +21,10 @@ export const addDevice = device => (
 )
 
 export const connectedDevice = device => (
-        {
-            type: CONNECTED_DEVICE,
-            payload: device,
-        }
+    {
+        type: CONNECTED_DEVICE,
+        payload: device,
+    }
 )
 
 export const addWifiData = data => (
@@ -31,7 +32,16 @@ export const addWifiData = data => (
         type: ADD_WIFI_DATA,
         payload: data,
     }
+
 )
+
+export const clearWifiData = () => (
+    {
+        type: CLEAR_WIFI_DATA,
+        payload: null,
+    }
+)
+
 export const reconstructData = () => (
     {
         type: RECONSTRUCT_DATA,
@@ -55,14 +65,8 @@ export const setInternetConnectionStatus = (value) => (
 
 export const scanWifi = (device) => {
     return async (dispatch, getState, BLEManager) => {
-        // console.log('scanning')
-
-        // console.log(getState().BLE.wifiService)
-        // console.log(getState().BLE.scanCharacteristic)
-        // console.log(encode("1"))
-        // console.log(device.characteristics)
-
-        await device.writeCharacteristicWithResponseForService(BLE.WIFI_SERVICE, BLE.SCAN_CHARACTERISTIC, encode("1"))
+        dispatch(clearWifiData())
+        await getState().BLE.connectedDevice.writeCharacteristicWithResponseForService(BLE.WIFI_SERVICE, BLE.SCAN_CHARACTERISTIC, encode("1"))
     }
 }
     
@@ -114,11 +118,12 @@ export const connectTo = (device) => {
                 device.monitorCharacteristicForService(BLE.WIFI_SERVICE, BLE.SCAN_CHARACTERISTIC, (error, characteristic) => {
                     if (characteristic && !error) {
                         const data = decode(characteristic.value);
+                        console.log("Data:" + data)
+
                         if (data.slice(-1) == "\0") {
-                            dispatch(addWifiData(data.slice(0, -1)));
+                            console.log("Got terminator")
+                            dispatch(addWifiData(data.slice(0, -1)))
                             dispatch(reconstructData())
-                            // this.setState({ wifiNetworks: this.reconstructData() });
-                            
                         } else {
                             dispatch(addWifiData(data));
                         }
@@ -136,7 +141,15 @@ export const connectTo = (device) => {
     }
 }
 
-
+export const connectToWifi = (details) => {
+    return async (_dispatch, getState, BLEManager) => {
+        console.log(details);
+        await getState().BLE.connectedDevice.writeCharacteristicWithResponseForService(BLE.WIFI_SERVICE, BLE.CONNECTION_CHARACTERISTIC, encode(JSON.stringify(details))).then(
+            console.log('Done!')
+        )
+        // BLEManager.connectedDevices().then((UUIDS) => { UUIDS.map((UUID) => { BLEManager.cancelDeviceConnection(UUID); }); });
+    }
+}
 
 export const disconnectDevices = () => {
     return (_dispatch, _getState, BLEManager) => {

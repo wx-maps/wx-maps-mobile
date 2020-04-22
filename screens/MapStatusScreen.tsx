@@ -1,65 +1,26 @@
 import React, { Component } from 'react';
-import {StyleSheet, View, ScrollView, SafeAreaView } from 'react-native';
+import {StyleSheet, View, ScrollView, SafeAreaView} from 'react-native';
 import { connect } from 'react-redux';
 
-import { Text, Card, Title, Caption } from 'react-native-paper';
+import { Button } from 'react-native-paper';
 
-import * as Styles from '../styles'
 
+import { Status } from '../components/Status';
 
 
 class MapStatusScreen extends Component{
-    deviceConnected(){
-        console.log(this.props.BLE.connectedDevice)
-        return this.props.BLE.connectedDevice
-    }
-
-    deviceName(){
-        if(!this.deviceConnected()){ return 'Disconnected' }
-        return this.props.BLE.connectedDevice.name
-    }
-
-    deviceID(){
-        if(!this.deviceConnected()){ return 'Disconnected' }
-
-        return this.props.BLE.connectedDevice.id
-    }
-
-    // FIXME:Why does connectedDevice not show this but devices[0] does?
-    deviceRSSI(){
-        if(!this.deviceConnected()){ return 'Disconnected' }
-
-        return this.props.BLE.devices[0].rssi
-    }
-
-    isConnectedToInternet(){
-        if(!this.deviceConnected()){ return 'Disconnected' }
-
-        return this.props.BLE.wifi.connectedToInternet == 'true' ? 'Connected' : 'Disconnected'
-    }
-
-    ipAddress(){
-        if(!this.deviceConnected()){ return 'Disconnected' }
-        return this.props.BLE.wifi.ipAddress
-    }
-
     render(){
         return(
-            <SafeAreaView>
+            <SafeAreaView style={{height: '100%'}}>
                 <ScrollView>   
                     <View style={styles.flexContainer}>                     
-                        <BluetoothStatus connectedDevice={ this.props.BLE.connectedDevice } />
-                    
-                        <InternetStatus wifiInfo={this.props.BLE.wifi} />
-
-                        <IPStatus wifiInfo={this.props.BLE.wifi} />
-
+                        <BluetoothStatus connectedDevice={ this.props.BLE.connectedDevice} renderIfDisconnected={true} />
                         <DeviceName connectedDevice={ this.props.BLE.connectedDevice }/>
-
                         <DeviceID connectedDevice={ this.props.BLE.connectedDevice } />
-
                         <DeviceRSSI connectedDevice={ this.props.BLE.devices[0] } />
-                    
+                        <InternetStatus wifiInfo={this.props.BLE.wifi} renderIfDisconnected={true} />
+                        <ConfigureWifi connectedDevice={this.props.BLE.connectedDevice} navigation={this.props.navigation}/>
+                        <IPStatus wifiInfo={this.props.BLE.wifi} />
                     </View>
                 </ScrollView>
             </SafeAreaView>
@@ -67,53 +28,60 @@ class MapStatusScreen extends Component{
     }
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
     flexContainer: { flexDirection: "row", flex: 1,  flexWrap: 'wrap', justifyContent: 'space-evenly' },
     statusBox: {flex: 0, padding: 20, margin: 5, borderColor: 'black', textAlign: 'center', borderWidth: 0, },
-    cardContent: {paddingHorizontal: 5, paddingVertical: 5, textAlign: 'center'},
-    centered: {textAlign: 'center'},
-    success: {color: 'green'}
 });
 
-
-class Status extends Component {
-    static CONNECTED= 'Connected'
-    static DISCONNECTED = 'Disconnected'
-
+class InternetStatus extends Status{
     constructor(props){
         super(props);
-        this.isConnected = false;
-        this.connectionString = Status.DISCONNECTED;
-        this.style = Styles.Colors.Failure;
-        this.itemName = 'Generic Status'
-    }
+        this.itemName = 'Internet';
 
-    setIsConnected(value){
-        this.isConnected = value
-        this.setConnectionString();
-        this.setStyle()
-    }
+        (this.props.wifiInfo && this.props.wifiInfo.connectedToInternet === 'true') ? this.setIsConnected(true) : this.setIsConnected(false);
 
-    setConnectionString(){
-        this.connectionString = (this.isConnected) ?  Status.CONNECTED : Status.DISCONNECTED
-    }
-
-    setStyle(){
-        this.style = (this.isConnected) ?  Styles.Colors.Success : Styles.Colors.Failure
-    }
-
-    render() {
-        return(
-            <StatusBox itemName={this.itemName} itemValue={this.connectionString} style={this.style} />
-        )
     }
 }
+
+class ConfigureWifi extends Component {
+    constructor(props){
+        super(props);
+        
+        this.shouldRender = false;
+
+        this.bluetoothConnected = true;
+        this.wifiConnected = false;
+
+        this.setShouldRender();
+    }
+
+    setShouldRender(){
+        this.shouldRender = (this.bluetoothConnected && !this.wifiConnected) ? true : false
+    }
+
+    render(){
+        if(this.shouldRender) { 
+            return(
+                <Button 
+                    style={[styles.statusBox, {paddingTop: 40, paddingBottom: 40}]} 
+                    mode='contained'
+                    onPress={() => this.props.navigation.navigate('ConfigureWifi')}
+                >
+                    Configure WiFi
+                </Button>
+            )
+        } else{
+            return(null)
+        }
+    }
+}
+
 class IPStatus extends Status {
     constructor(props){
         super(props);
         this.itemName = 'IP Address';
 
-        (this.props.wifiInfo) ? this.setIsConnected(true) : this.setIsConnected(false);
+        (this.props.wifiInfo && this.props.wifiInfo.connectedToInternet === 'true') ? this.setIsConnected(true) : this.setIsConnected(false);
     }
 
     setConnectionString(){
@@ -169,29 +137,6 @@ class DeviceRSSI extends Status{
     
     setConnectionString(){
         this.connectionString = (this.isConnected) ?  this.props.connectedDevice.rssi : Status.DISCONNECTED
-    }
-}
-
-class InternetStatus extends Status{
-    constructor(props){
-        super(props);
-        this.itemName = 'Internet';
-
-        (this.props.wifiInfo && this.props.wifiInfo.connectedToInternet === 'true') ? this.setIsConnected(true) : this.setIsConnected(false);
-
-    }
-}
-
-class StatusBox extends Component {
-    render() {
-        return(
-            <Card style={[styles.statusBox, this.props.style]}>
-                <Card.Content style={styles.cardContent}>
-                    <Title style={[styles.centered, this.props.style]}>{this.props.itemValue}</Title>
-                    <Caption style={[styles.centered, this.props.style]}>{this.props.itemName}</Caption>
-                </Card.Content>
-            </Card>
-        )
     }
 }
 

@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { Provider as PaperProvider } from 'react-native-paper';
-import { NavigationContainer, CommonActions } from '@react-navigation/native';
-import { BleManager } from "react-native-ble-plx";
+import { NavigationContainer, CommonActions} from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { BleManager } from "react-native-ble-plx";
+
 
 
 // Redux
@@ -14,7 +16,7 @@ import thunk from 'redux-thunk';
 // Screens
 import MapStatusScreen from './screens/MapStatusScreen';
 import HomeScreen from './screens/HomeScreen';
-import DetailsScreen from './screens/DetailsScreen';
+import ConfigureWifiScreen from './screens/ConfigureWifiScreen';
 
 //
 import * as Styles from './styles'
@@ -22,8 +24,20 @@ import * as Styles from './styles'
 
 const BLEManager = new BleManager();
 
-const store = createStore(rootReducer, applyMiddleware(thunk.withExtraArgument(BLEManager)));
+
+const StatusStack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
+const store = createStore(rootReducer, applyMiddleware(thunk.withExtraArgument(BLEManager)));
+
+
+function StatusStackScreen(){
+  return(
+    <StatusStack.Navigator headerMode='none' >
+      <StatusStack.Screen name="MapStatus" component={MapStatusScreen} />
+      <StatusStack.Screen name="ConfigureWifi" component={ConfigureWifiScreen} />
+    </StatusStack.Navigator>
+  )
+}
 
 
 export default class App extends Component {
@@ -43,7 +57,7 @@ export default class App extends Component {
               }
             >
               <Tab.Screen name="Map Status" component={HomeScreen} />
-              <Tab.Screen name="Connection Status" component={MapStatusScreen} />
+              <Tab.Screen name="Connection Status" component={StatusStackScreen} />
             </Tab.Navigator>
           </NavigationContainer>
         </PaperProvider>
