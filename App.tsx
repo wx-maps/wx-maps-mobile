@@ -6,9 +6,12 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import { BleManager } from "react-native-ble-plx";
 
 
+import { startScan, disconnectDevices } from './actions/BLEActions';
+import { hideSnackbar } from './actions/AppActions';
+
 
 // Redux
-import { Provider as StoreProvider } from 'react-redux';
+import { Provider as StoreProvider, connect } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import rootReducer from './reducers/';
 import thunk from 'redux-thunk';
@@ -40,16 +43,22 @@ function StatusStackScreen(){
   )
 }
 
-
-export default class App extends Component {
+class App extends Component {
   constructor(props){
     super(props)
-    console.log("Welcome!")
+    console.log("Welcome!");
+    this.props.startScan();
+
   }
+
+  componentWillUnmount() {
+    console.log("Disconnecting")
+    this.props.disconnectDevices();
+}
+
   
   render() {
     return(
-      <StoreProvider store={store}>
         <PaperProvider>
           <NavigationContainer>        
             <Tab.Navigator
@@ -60,12 +69,28 @@ export default class App extends Component {
               <Tab.Screen name="Map Status" component={HomeScreen} />
               <Tab.Screen name="Connection Status" component={StatusStackScreen} />
             </Tab.Navigator>
-            {/* <Snackbar style={{marginBottom: 60}} visible={true}>Hello!</Snackbar> */}
+            <Snackbar style={{marginBottom: 60}} duration={3000} visible={this.props.App.snackbarVisible} onDismiss={() => {this.props.hideSnackbar()}}>{this.props.App.snackbarText}</Snackbar>
 
           </NavigationContainer>
         </PaperProvider>
-      </StoreProvider>
     )
   }
 }
 
+function mapStateToProps(state){
+  const { BLE, App } = state
+  return { BLE, App }
+};
+
+const mapDispatchToProps = dispatch => ({
+  hideSnackbar: () => dispatch(hideSnackbar()),
+  startScan: () => dispatch(startScan()),
+  disconnectDevices: () => dispatch(disconnectDevices()),
+});
+
+
+const ConnectedApp = connect(mapStateToProps, mapDispatchToProps)(App);
+
+export default () => {
+  return <StoreProvider store={store}><ConnectedApp/></StoreProvider>
+}
