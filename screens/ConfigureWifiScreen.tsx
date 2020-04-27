@@ -30,15 +30,15 @@ class ConfigureWifiScreen extends Component {
   }
 
   render() {
-    const networks = this.props.BLE.wifiNetworks.map((wifiNetwork, i) => { 
-      return(<Item key={shortid.generate()} itemCaption={wifiNetwork.quality + '%'} onPress={ () => { this.showConnectDialog(wifiNetwork) } }>{wifiNetwork.ssid}</Item>)
-    })
-
     return (
       <SafeAreaView style={{height: '100%'}}>
         <ScrollView>
           <Headline style={{textAlign: 'center'}}>{this.title}</Headline>
-          {networks}
+          {
+            this.props.BLE.wifiNetworks.map((wifiNetwork, i) => { 
+              return(<Item key={shortid.generate()} itemCaption={wifiNetwork.quality + '%'} onPress={ () => { this.showConnectDialog(wifiNetwork) } }>{wifiNetwork.ssid}</Item>)
+            })
+          }
           <Button onPress={() => {this.props.scanWifi()}}>Scan Again</Button>
         </ScrollView>
 
