@@ -35,7 +35,7 @@ export class Status extends Component {
 
     render() {
         if (this.isConnected || this.renderIfDisconnected) {
-            return (<StatusBox itemName={this.itemName} itemValue={this.connectionString} style={this.style}>
+            return (<StatusBox itemName={this.itemName} itemValue={this.connectionString} style={this.style} onPress={this.props.onPress}>
                 {this.connectionString}
             </StatusBox>);
         }

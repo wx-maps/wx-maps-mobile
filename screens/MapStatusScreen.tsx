@@ -4,11 +4,19 @@ import { connect } from 'react-redux';
 
 import { Button } from 'react-native-paper';
 
+import { disconnectDevices, disconnectWifi } from '../actions/BLEActions';
+
+
 
 import { Status } from '../components/Status';
+import { StatusBox } from '../components/StatusBox';
 
 
 class MapStatusScreen extends Component{
+    componentWillUnmount() {
+        this.props.disconnectDevices()
+    }
+
     render(){
         return(
             <SafeAreaView style={{height: '100%'}}>
@@ -18,10 +26,9 @@ class MapStatusScreen extends Component{
                         <DeviceName connectedDevice={ this.props.BLE.connectedDevice }/>
                         <DeviceID connectedDevice={ this.props.BLE.connectedDevice } />
                         <DeviceRSSI connectedDevice={ this.props.BLE.devices[0] } />
-                        <InternetStatus wifiInfo={this.props.BLE.wifi} renderIfDisconnected={true} />
+                        <InternetStatus wifiInfo={this.props.BLE.wifi} renderIfDisconnected={true} onPress={() => this.props.disconnectWifi()}/>
                         <IPStatus wifiInfo={this.props.BLE.wifi} />
                         <ConfigureWifi connectedDevice={this.props.BLE.connectedDevice} navigation={this.props.navigation} style={{marginTop: 'auto'}} />
-
                     </View>
                 </ScrollView>
             </SafeAreaView>
@@ -33,6 +40,7 @@ export const styles = StyleSheet.create({
     flexContainer: { flexDirection: "row", flex: 1,  flexWrap: 'wrap', justifyContent: 'space-evenly' },
     statusBox: {flex: 0, padding: 20, margin: 5, borderColor: 'black', textAlign: 'center', borderWidth: 0, },
 });
+
 
 class InternetStatus extends Status{
     constructor(props){
@@ -148,10 +156,8 @@ function mapStateToProps(state){
 };
 
 const mapDispatchToProps = dispatch => ({
-    // addDevice,
-    // startScan: () => dispatch(startScan()),
-    // disconnectDevices: () => dispatch(disconnectDevices()),
-    // scanWifi: () => dispatch(scanWifi())
+    disconnectDevices: () => dispatch(disconnectDevices()),
+    disconnectWifi: () => dispatch(disconnectWifi()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(MapStatusScreen);

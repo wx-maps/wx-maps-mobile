@@ -22,6 +22,7 @@ class ConfigureWifiScreen extends Component {
   connectToWifi = () => {
     this.props.connectToWifi(
       {
+        operation: 'connect',
         ssid: this.props.BLE.wifi.selectedWifiNetwork.ssid, 
         password: this.state.wifiPassword,
       }
@@ -29,11 +30,10 @@ class ConfigureWifiScreen extends Component {
   }
 
   render() {
-
     const networks = this.props.BLE.wifiNetworks.map((wifiNetwork, i) => { 
-
       return(<Item key={shortid.generate()} itemCaption={wifiNetwork.quality + '%'} onPress={ () => { this.showConnectDialog(wifiNetwork) } }>{wifiNetwork.ssid}</Item>)
     })
+
     return (
       <SafeAreaView style={{height: '100%'}}>
         <ScrollView>

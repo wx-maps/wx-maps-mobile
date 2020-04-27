@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Provider as PaperProvider } from 'react-native-paper';
+import { Provider as PaperProvider, Snackbar } from 'react-native-paper';
 import { NavigationContainer, CommonActions} from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
@@ -35,6 +35,7 @@ function StatusStackScreen(){
     <StatusStack.Navigator headerMode='none' >
       <StatusStack.Screen name="MapStatus" component={MapStatusScreen} />
       <StatusStack.Screen name="ConfigureWifi" component={ConfigureWifiScreen} />
+
     </StatusStack.Navigator>
   )
 }
@@ -59,6 +60,8 @@ export default class App extends Component {
               <Tab.Screen name="Map Status" component={HomeScreen} />
               <Tab.Screen name="Connection Status" component={StatusStackScreen} />
             </Tab.Navigator>
+            {/* <Snackbar style={{marginBottom: 60}} visible={true}>Hello!</Snackbar> */}
+
           </NavigationContainer>
         </PaperProvider>
       </StoreProvider>

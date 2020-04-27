@@ -17,14 +17,14 @@ class HomeScreen extends Component {
     }
 
     componentWillUnmount() {
+        console.log("Disconnecting")
         this.props.disconnectDevices()
     }
 
     render() {
         // console.log(this.props)
-        return (
-        <View style={styles.container}>
-            <Text>Device count: {this.props.BLE.devices.length}</Text>
+        return (<View style={styles.container}>
+          <Text>Device count: {this.props.BLE.devices.length}</Text>
             {this.props.BLE.devices.map((device, i) => { return <BleDevice device={device} key={i} navigation={this.props.navigation} manager={this.manager} />; })}
             <Text>Connected Device: { this.props.BLE.connectedDevice && this.props.BLE.connectedDevice.name }</Text>
 

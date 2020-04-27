@@ -5,12 +5,14 @@ import { Card, Title, Caption } from 'react-native-paper';
 
 export class StatusBox extends Component {
     render() {
-        return (<Card style={[styles.statusBox, this.props.style]}>
-            <Card.Content style={styles.cardContent}>
-                <Title style={[styles.centered, this.props.style]}>{this.props.children}</Title>
-                <Caption style={[styles.centered, this.props.style]}>{this.props.itemName}</Caption>
-            </Card.Content>
-        </Card>);
+        return (
+            <Card style={[styles.statusBox, this.props.style]} onPress={this.props.onPress}>
+                <Card.Content style={styles.cardContent}>
+                    <Title style={[styles.centered, this.props.style]}>{this.props.children}</Title>
+                    <Caption style={[styles.centered, this.props.style]}>{this.props.itemName}</Caption>
+                </Card.Content>
+            </Card>
+        );
     }
 }
 

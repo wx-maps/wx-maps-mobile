@@ -87,8 +87,8 @@ export const setInternetConnectionStatus = (value) => (
         payload: value,
     }
 )
-
-export const scanWifi = (device) => {
+// FIXME unhandled promise
+export const scanWifi = () => {
     return async (dispatch, getState, BLEManager) => {
         dispatch(clearWifiData())
         await getState().BLE.connectedDevice.writeCharacteristicWithResponseForService(BLE.WIFI_SERVICE, BLE.SCAN_CHARACTERISTIC, encode("1"))
@@ -99,6 +99,8 @@ export const startScan = () => {
     return (dispatch, _getState, BLEManager) => {
         // you can use Device Manager here
         const subscription = BLEManager.onStateChange((state) => {
+            console.log("State: " + state);
+
             if (state === 'PoweredOn') {
                 dispatch(scan());
                 subscription.remove();
@@ -168,9 +170,26 @@ export const connectTo = (device) => {
 
 export const connectToWifi = (details) => {
     return async (dispatch, getState, BLEManager) => {
-        await getState().BLE.connectedDevice.writeCharacteristicWithResponseForService(BLE.WIFI_SERVICE, BLE.CONNECTION_CHARACTERISTIC, encode(JSON.stringify(details))).then( () => {
+        const connectionDetails = JSON.stringify(details)
+
+        await getState().BLE.connectedDevice.writeCharacteristicWithResponseForService(BLE.WIFI_SERVICE, BLE.CONNECTION_CHARACTERISTIC, encode(connectionDetails)).then( () => {
             console.log('Done!')
             dispatch(hideConnectDialog())
+        })
+        // TODO:
+        // dispatch CONNECTING_TO_WIFI
+        
+        
+    }
+}
+
+export const disconnectWifi = () => {
+    return async (dispatch, getState, BLEManager) => {
+        const connectionDetails = JSON.stringify({operation: "disconnect"});
+
+        await getState().BLE.connectedDevice.writeCharacteristicWithResponseForService(BLE.WIFI_SERVICE, BLE.CONNECTION_CHARACTERISTIC, encode(connectionDetails)).then( () => {
+            console.log('Done!')
+            //dispatch(hideConnectDialog())
         })
         // TODO:
         // dispatch CONNECTING_TO_WIFI
