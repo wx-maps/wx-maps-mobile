@@ -4,8 +4,7 @@ import { View, StyleSheet } from 'react-native';
 import { Text, Button, List, Snackbar } from 'react-native-paper';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { startScan, scanWifi, disconnectDevices } from '../actions/BLEActions';
-import {hideSnackbar} from '../actions/AppActions'
+import { scanWifi } from '../actions/BLEActions';
 
 import { Base } from '../styles'
 require("json-circular-stringify");
@@ -13,12 +12,6 @@ require("json-circular-stringify");
 class HomeScreen extends Component {
     constructor(props){
         super(props)
-        this.props.startScan();
-    }
-
-    componentWillUnmount() {
-        console.log("Disconnecting")
-        this.props.disconnectDevices()
     }
 
     render() {
@@ -65,9 +58,6 @@ function mapStateToProps(state){
 };
 
 const mapDispatchToProps = dispatch => ({
-    hideSnackbar: () => dispatch(hideSnackbar()),
-    startScan: () => dispatch(startScan()),
-    disconnectDevices: () => dispatch(disconnectDevices()),
     scanWifi: () => dispatch(scanWifi()),
 });
 

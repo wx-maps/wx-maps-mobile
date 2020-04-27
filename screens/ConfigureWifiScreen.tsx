@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { connect } from 'react-redux';
-import { Headline, Button, Dialog, Portal, Text, TextInput } from 'react-native-paper';
+import { Headline, Button, Dialog, Portal, TextInput } from 'react-native-paper';
 import { scanWifi, connectToWifi, showConnectDialog, hideConnectDialog } from '../actions/BLEActions';
 import {Item} from '../components/Item'
 const shortid = require('shortid');

@@ -9,12 +9,36 @@ import { disconnectDevices, disconnectWifi } from '../actions/BLEActions';
 
 
 import { Status } from '../components/Status';
-import { StatusBox } from '../components/StatusBox';
 
 
 class MapStatusScreen extends Component{
-    componentWillUnmount() {
-        this.props.disconnectDevices()
+    bleConnected(){
+        return this.props.BLE.connectedDevice
+    }
+    
+    deviceName(){
+        return (this.bleConnected() && this.props.BLE.connectedDevice.name)
+    }
+
+    deviceID(){
+        return (this.bleConnected() && this.props.BLE.connectedDevice.id)
+    }
+
+    deviceRSSI(){
+        return (this.props.BLE.devices[0] && this.props.BLE.devices[0].rssi)
+    }
+
+    internetConnected(){
+        console.log(this.props.BLE)
+        return (this.bleConnected() && this.props.BLE.wifi && this.props.BLE.wifi.connectedToInternet === "true")
+    }
+
+    ipAddress(){
+        return (this.bleConnected() && this.props.BLE.wifi && this.props.BLE.wifi.ipAddress)
+    }
+
+    configWifiShouldRender(){
+        return (this.bleConnected() && !this.internetConnected())
     }
 
     render(){
@@ -22,13 +46,13 @@ class MapStatusScreen extends Component{
             <SafeAreaView style={{height: '100%'}}>
                 <ScrollView>   
                     <View style={styles.flexContainer}>                     
-                        <BluetoothStatus connectedDevice={ this.props.BLE.connectedDevice} renderIfDisconnected={true} />
-                        <DeviceName connectedDevice={ this.props.BLE.connectedDevice }/>
-                        <DeviceID connectedDevice={ this.props.BLE.connectedDevice } />
-                        <DeviceRSSI connectedDevice={ this.props.BLE.devices[0] } />
-                        <InternetStatus wifiInfo={this.props.BLE.wifi} renderIfDisconnected={true} onPress={() => this.props.disconnectWifi()}/>
-                        <IPStatus wifiInfo={this.props.BLE.wifi} />
-                        <ConfigureWifi connectedDevice={this.props.BLE.connectedDevice} navigation={this.props.navigation} style={{marginTop: 'auto'}} />
+                        <Bluetooth  itemName='Bluetooth' isConnected={this.props.BLE.isConnected} renderIfDisconnected={true} />
+                        <DeviceName itemName='Device Name' connectedString={this.deviceName()} isConnected={this.props.BLE.isConnected}/>
+                        <DeviceID   itemName='Device ID' connectedString={this.deviceID()} isConnected={this.props.BLE.isConnected} />
+                        <DeviceRSSI itemName='Device RSSI' connectedString={ this.deviceRSSI() } isConnected={this.props.BLE.isConnected} />
+                        <InternetStatus itemName='Internet'  isConnected={this.internetConnected()} renderIfDisconnected={true} />
+                        <IPStatus itemName='IP Address' connectedString={this.ipAddress()} isConnected={this.internetConnected()}/>
+                        <ConfigureWifi shouldRender={this.configWifiShouldRender()} navigation={this.props.navigation} style={{marginTop: 'auto'}} />
                     </View>
                 </ScrollView>
             </SafeAreaView>
@@ -43,33 +67,11 @@ export const styles = StyleSheet.create({
 
 
 class InternetStatus extends Status{
-    constructor(props){
-        super(props);
-        this.itemName = 'Internet';
-
-        (this.props.wifiInfo && this.props.wifiInfo.connectedToInternet === 'true') ? this.setIsConnected(true) : this.setIsConnected(false);
-
-    }
 }
 
 class ConfigureWifi extends Component {
-    constructor(props){
-        super(props);
-        
-        this.shouldRender = false;
-
-        this.bluetoothConnected = true;
-        this.wifiConnected = false;
-
-        this.setShouldRender();
-    }
-
-    setShouldRender(){
-        this.shouldRender = (this.bluetoothConnected && !this.wifiConnected) ? true : false
-    }
-
     render(){
-        if(this.shouldRender) { 
+        if(this.props.shouldRender) { 
             return(
                 <Button 
                     style={[styles.statusBox, {paddingTop: 40, paddingBottom: 40}]} 
@@ -85,69 +87,11 @@ class ConfigureWifi extends Component {
     }
 }
 
-class IPStatus extends Status {
-    constructor(props){
-        super(props);
-        this.itemName = 'IP Address';
-
-        (this.props.wifiInfo && this.props.wifiInfo.connectedToInternet === 'true') ? this.setIsConnected(true) : this.setIsConnected(false);
-    }
-
-    setConnectionString(){
-        this.connectionString = (this.isConnected) ?  this.props.wifiInfo.ipAddress : Status.DISCONNECTED
-    }
-}
-
-class BluetoothStatus extends Status{
-    constructor(props){
-        super(props);
-        this.itemName = 'Bluetooth';
-
-        (this.props.connectedDevice) ? this.setIsConnected(true) : this.setIsConnected(false);
-    }
-}
-
-class DeviceName extends Status{
-    constructor(props){
-        super(props);
-        this.itemName = 'Device Name';
-
-        
-        (this.props.connectedDevice) ? this.setIsConnected(true) : this.setIsConnected(false);
-    }
-    
-    setConnectionString(){
-        this.connectionString = (this.isConnected) ?  this.props.connectedDevice.name : Status.DISCONNECTED
-    }
-}
-
-class DeviceID extends Status{
-    constructor(props){
-        super(props);
-        this.itemName = 'Device ID';
-
-        
-        (this.props.connectedDevice) ? this.setIsConnected(true) : this.setIsConnected(false);
-    }
-    
-    setConnectionString(){
-        this.connectionString = (this.isConnected) ?  this.props.connectedDevice.id : Status.DISCONNECTED
-    }
-}
-
-class DeviceRSSI extends Status{
-    constructor(props){
-        super(props);
-        this.itemName = 'Device RSSI';
-
-        
-        (this.props.connectedDevice) ? this.setIsConnected(true) : this.setIsConnected(false);
-    }
-    
-    setConnectionString(){
-        this.connectionString = (this.isConnected) ?  this.props.connectedDevice.rssi : Status.DISCONNECTED
-    }
-}
+class IPStatus extends Status {}
+class Bluetooth extends Status{}
+class DeviceName extends Status{}
+class DeviceID extends Status{}
+class DeviceRSSI extends Status{}
 
 
 function mapStateToProps(state){

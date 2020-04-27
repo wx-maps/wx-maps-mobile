@@ -18,6 +18,7 @@ const INITIAL_STATE = {
   wifiDataBuffer: [],
   wifiNetworks: [],
   connectedDevice: null,
+  isConnected: false,
   wifi: { 
     connectedToInternet: false,
     ipAddress: null,
@@ -46,7 +47,7 @@ export const BLEReducer = (state = INITIAL_STATE, action) => {
         return {...state}
       }
     case CONNECTED_DEVICE:
-      return {...state, connectedDevice: action.payload}
+      return {...state, connectedDevice: action.payload, isConnected: true}
     case SET_IP_ADDRESS:
       return {...state, wifi: { ...state.wifi, ipAddress: action.payload}}
     case SET_INTERNET_CONNECTION_STATUS:

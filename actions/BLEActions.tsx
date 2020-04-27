@@ -216,9 +216,9 @@ function decode(data: string) {
 
 // FIXME: This doesn't appear to do anything...?
 function updateRSSI(device){
-    // device.readRSSI().then(
-    //     setTimeout(updateRSSI, 3000, device)
-    // )
+    device.readRSSI().then(() => {
+        setTimeout(updateRSSI, 3000, device)
+    })
 }
 
 const readIPAddress = (device) => {

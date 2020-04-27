@@ -7,36 +7,38 @@ export class Status extends Component {
     static CONNECTED = 'Connected';
     static DISCONNECTED = 'Disconnected';
     static defaultProps = {
-        renderIfDisconnected: false
+        renderIfDisconnected: false,
+        itemName: 'Generic Status',
+        connectedString: 'Connected',
     };
     
     constructor(props) {
         super(props);
-        this.isConnected = false;
-        this.connectionString = Status.DISCONNECTED;
-        this.style = Styles.Colors.Failure;
-        this.itemName = 'Generic Status';
-        this.renderIfDisconnected = this.props.renderIfDisconnected;
+        // this.state = {
+        //     connectionString: Status.DISCONNECTED,
+        //     style: Styles.Colors.Failure,
+        //     itemName: this.props.itemName,
+        // }
+
+        // this.isConnected = false;
+        // this.connectionString = Status.DISCONNECTED;
+        // this.style = Styles.Colors.Failure;
+        // this.itemName = 'Generic Status';
+        // this.renderIfDisconnected = this.props.renderIfDisconnected;
     }
 
-    setIsConnected(value) {
-        this.isConnected = value;
-        this.setConnectionString();
-        this.setStyle();
+    connectionString(){
+        return (this.props.isConnected) ? this.props.connectedString : Status.DISCONNECTED
     }
 
-    setConnectionString() {
-        this.connectionString = (this.isConnected) ? Status.CONNECTED : Status.DISCONNECTED;
-    }
-
-    setStyle() {
-        this.style = (this.isConnected) ? Styles.Colors.Success : Styles.Colors.Failure;
+    style(){
+        return (this.props.isConnected) ? Styles.Colors.Success : Styles.Colors.Failure
     }
 
     render() {
-        if (this.isConnected || this.renderIfDisconnected) {
-            return (<StatusBox itemName={this.itemName} itemValue={this.connectionString} style={this.style} onPress={this.props.onPress}>
-                {this.connectionString}
+        if (this.props.isConnected || this.props.renderIfDisconnected) {
+            return (<StatusBox itemName={this.props.itemName} style={this.style()} onPress={this.props.onPress}>
+                {this.connectionString()}
             </StatusBox>);
         }
         else {
