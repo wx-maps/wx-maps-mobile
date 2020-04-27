@@ -1,15 +1,21 @@
 import React, { Component } from 'react';
-import {StyleSheet, View, ScrollView, SafeAreaView} from 'react-native';
+import {View, ScrollView, SafeAreaView} from 'react-native';
 import { connect } from 'react-redux';
 
 import { Button } from 'react-native-paper';
 
 import { disconnectDevices, disconnectWifi } from '../actions/BLEActions';
 
+import * as Styles from '../styles';
 
 
 import { Status } from '../components/Status';
-
+class Bluetooth extends Status{}
+class DeviceName extends Status{}
+class DeviceID extends Status{}
+class DeviceRSSI extends Status{}
+class InternetStatus extends Status{}
+class IPStatus extends Status {}
 
 class MapStatusScreen extends Component{
     bleConnected(){
@@ -38,14 +44,14 @@ class MapStatusScreen extends Component{
     }
 
     configWifiShouldRender(){
-        return (this.bleConnected() && !this.internetConnected())
+        return (this.bleConnected() && this.internetConnected())
     }
 
     render(){
         return(
             <SafeAreaView style={{height: '100%'}}>
                 <ScrollView>   
-                    <View style={styles.flexContainer}>                     
+                    <View style={Styles.Base.statusBoxContainer}>                     
                         <Bluetooth  itemName='Bluetooth' isConnected={this.props.BLE.isConnected} renderIfDisconnected={true} />
                         <DeviceName itemName='Device Name' connectedString={this.deviceName()} isConnected={this.props.BLE.isConnected}/>
                         <DeviceID   itemName='Device ID' connectedString={this.deviceID()} isConnected={this.props.BLE.isConnected} />
@@ -60,21 +66,16 @@ class MapStatusScreen extends Component{
     }
 }
 
-export const styles = StyleSheet.create({
-    flexContainer: { flexDirection: "row", flex: 1,  flexWrap: 'wrap', justifyContent: 'space-evenly' },
-    statusBox: {flex: 0, padding: 20, margin: 5, borderColor: 'black', textAlign: 'center', borderWidth: 0, },
-});
-
-
-class InternetStatus extends Status{
+type ConfigureWifiProps = {
+    shouldRender: boolean,
 }
-
-class ConfigureWifi extends Component {
+class ConfigureWifi extends Component<ConfigureWifiProps> {
+    
     render(){
         if(this.props.shouldRender) { 
             return(
                 <Button 
-                    style={[styles.statusBox, {paddingTop: 40, paddingBottom: 40}]} 
+                    style={Styles.Base.statusBoxButton} 
                     mode='contained'
                     onPress={() => this.props.navigation.navigate('ConfigureWifi')}
                 >
@@ -87,11 +88,6 @@ class ConfigureWifi extends Component {
     }
 }
 
-class IPStatus extends Status {}
-class Bluetooth extends Status{}
-class DeviceName extends Status{}
-class DeviceID extends Status{}
-class DeviceRSSI extends Status{}
 
 
 function mapStateToProps(state){

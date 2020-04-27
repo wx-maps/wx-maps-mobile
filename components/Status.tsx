@@ -3,7 +3,14 @@ import { StatusBox } from "./StatusBox";
 import * as Styles from '../styles'
 
 
-export class Status extends Component {
+type StatusProps = {
+    isConnected: boolean,
+    connectedString: string,
+    itemName: string,
+    renderIfDisconnected: boolean
+}
+
+export class Status extends Component<StatusProps> {
     static CONNECTED = 'Connected';
     static DISCONNECTED = 'Disconnected';
     static defaultProps = {
@@ -11,21 +18,6 @@ export class Status extends Component {
         itemName: 'Generic Status',
         connectedString: 'Connected',
     };
-    
-    constructor(props) {
-        super(props);
-        // this.state = {
-        //     connectionString: Status.DISCONNECTED,
-        //     style: Styles.Colors.Failure,
-        //     itemName: this.props.itemName,
-        // }
-
-        // this.isConnected = false;
-        // this.connectionString = Status.DISCONNECTED;
-        // this.style = Styles.Colors.Failure;
-        // this.itemName = 'Generic Status';
-        // this.renderIfDisconnected = this.props.renderIfDisconnected;
-    }
 
     connectionString(){
         return (this.props.isConnected) ? this.props.connectedString : Status.DISCONNECTED
@@ -37,7 +29,7 @@ export class Status extends Component {
 
     render() {
         if (this.props.isConnected || this.props.renderIfDisconnected) {
-            return (<StatusBox itemName={this.props.itemName} style={this.style()} onPress={this.props.onPress}>
+            return (<StatusBox itemName={this.props.itemName} style={this.style()}>
                 {this.connectionString()}
             </StatusBox>);
         }
