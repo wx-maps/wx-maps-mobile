@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import { SafeAreaView, ScrollView } from 'react-native';
 import { connect } from 'react-redux';
 import { Headline, Button, Dialog, Portal, TextInput } from 'react-native-paper';
 import { scanWifi, connectToWifi, showConnectDialog, hideConnectDialog } from '../actions/BLEActions';
@@ -62,10 +62,6 @@ class ConfigureWifiScreen extends Component {
     )
   }
 }
-
-const styles = StyleSheet.create({
-  container: { ...Base.container }
-});
 
 function mapStateToProps(state){
   const { BLE } = state

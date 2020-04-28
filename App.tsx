@@ -33,14 +33,15 @@ const Tab = createMaterialBottomTabNavigator();
 const store = createStore(rootReducer, applyMiddleware(thunk.withExtraArgument(BLEManager)));
 
 
-function StatusStackScreen(){
-  return(
-    <StatusStack.Navigator headerMode='none' >
-      <StatusStack.Screen name="MapStatus" component={MapStatusScreen} />
-      <StatusStack.Screen name="ConfigureWifi" component={ConfigureWifiScreen} />
-
-    </StatusStack.Navigator>
-  )
+class StatusStackScreen extends Component {
+  render(){
+    return(
+      <StatusStack.Navigator headerMode='none' >
+        <StatusStack.Screen name="MapStatus" component={MapStatusScreen} />
+        <StatusStack.Screen name="ConfigureWifi" component={ConfigureWifiScreen} />
+     </StatusStack.Navigator>
+    )
+  }
 }
 
 class App extends Component {
@@ -48,7 +49,6 @@ class App extends Component {
     super(props)
     console.log("Welcome!");
     this.props.startScan();
-
   }
 
   componentWillUnmount() {
@@ -61,16 +61,11 @@ class App extends Component {
     return(
         <PaperProvider>
           <NavigationContainer>        
-            <Tab.Navigator
-              barStyle={
-                Styles.Colors.barColor
-              }
-            >
+            <Tab.Navigator barStyle={Styles.Colors.barColor}>
               <Tab.Screen name="Map Status" component={HomeScreen} />
               <Tab.Screen name="Connection Status" component={StatusStackScreen} />
             </Tab.Navigator>
             <Snackbar style={{marginBottom: 60}} duration={3000} visible={this.props.App.snackbarVisible} onDismiss={() => {this.props.hideSnackbar()}}>{this.props.App.snackbarText}</Snackbar>
-
           </NavigationContainer>
         </PaperProvider>
     )

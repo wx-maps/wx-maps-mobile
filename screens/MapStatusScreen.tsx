@@ -35,7 +35,6 @@ class MapStatusScreen extends Component{
     }
 
     internetConnected(){
-        console.log(this.props.BLE)
         return (this.bleConnected() && this.props.BLE.wifi && this.props.BLE.wifi.connectedToInternet === "true")
     }
 

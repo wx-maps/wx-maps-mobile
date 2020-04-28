@@ -15,7 +15,6 @@ class HomeScreen extends Component {
     }
 
     render() {
-        // console.log(this.props)
         return (<View style={styles.container}>
           <Text>Device count: {this.props.BLE.devices.length}</Text>
             {this.props.BLE.devices.map((device, i) => { return <BleDevice device={device} key={i} navigation={this.props.navigation} manager={this.manager} />; })}

@@ -76,22 +76,51 @@ export const hideConnectDialog = () => (
     }
 )
 
-/*
- *
- * Thunk Actions
- * 
- */
 export const setInternetConnectionStatus = (value) => (
     {
         type: SET_INTERNET_CONNECTION_STATUS,
         payload: value,
     }
 )
+
+/*
+ *
+ * Thunk Actions
+ * 
+ */
+
+ export const disconnected = () => {
+    return async (dispatch, _getState, _BLEManager) => {
+        dispatch(scan());
+        dispatch(App.showSnackbar('Device disconnected'))
+    }
+ }
+
 // FIXME unhandled promise
 export const scanWifi = () => {
     return async (dispatch, getState, BLEManager) => {
         dispatch(clearWifiData())
-        await getState().BLE.connectedDevice.writeCharacteristicWithResponseForService(BLE.WIFI_SERVICE, BLE.SCAN_CHARACTERISTIC, encode("1"))
+        
+        try{ 
+            getState().BLE.connectedDevice.writeCharacteristicWithResponseForService(BLE.WIFI_SERVICE, BLE.SCAN_CHARACTERISTIC, encode("1")).then(() => {
+                console.log("Done scanning")
+            }).catch((error) => {
+                console.log("Error")
+                console.log(JSON.stringify(error))
+                if(error.name == 'BleError' && error.errorCode == 205){
+                    console.log('Disconnected')
+                    dispatch(disconnected())
+                } else {
+                    dispatch(App.showError(error))
+                }
+            })
+        } catch(error){
+            console.log('Error:')
+            console.log(error)
+
+            
+        }
+        
     }
 }
     
@@ -99,8 +128,6 @@ export const startScan = () => {
     return (dispatch, _getState, BLEManager) => {
         // you can use Device Manager here
         const subscription = BLEManager.onStateChange((state) => {
-            console.log("State: " + state);
-
             if (state === 'PoweredOn') {
                 dispatch(scan());
                 subscription.remove();
@@ -131,7 +158,7 @@ export const connectTo = (device) => {
         device.connect()
           .then((device) => {
               dispatch(connectedDevice(device))
-              dispatch(App.showSnackbar("Connected to device " + device.name + "\n(" + device.id + ')'))
+              dispatch(App.showConnectedSnackbar(device));
             return device.discoverAllServicesAndCharacteristics();
           })
           .then((device) => {
@@ -189,10 +216,8 @@ export const disconnectWifi = () => {
 
         await getState().BLE.connectedDevice.writeCharacteristicWithResponseForService(BLE.WIFI_SERVICE, BLE.CONNECTION_CHARACTERISTIC, encode(connectionDetails)).then( () => {
             console.log('Done!')
-            //dispatch(hideConnectDialog())
         })
-        // TODO:
-        // dispatch CONNECTING_TO_WIFI
+
         
         
     }

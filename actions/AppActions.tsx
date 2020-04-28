@@ -14,3 +14,17 @@ export const showSnackbar = (text: String) => (
         payload: text,
     }
 )
+
+export const showConnectedSnackbar = (device) => (
+    {
+        type: SHOW_SNACKBAR,
+        payload: "Connected to device " + device.name + "\n(" + device.id + ')'
+    }
+)
+
+export const showError = (error: Error) => (
+    {
+        type: SHOW_SNACKBAR,
+        payload: "An error occured: \n" + error
+    }
+)
