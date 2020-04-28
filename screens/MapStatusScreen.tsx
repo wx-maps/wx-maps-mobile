@@ -68,8 +68,7 @@ class MapStatusScreen extends Component{
 type ConfigureWifiProps = {
     shouldRender: boolean,
 }
-class ConfigureWifi extends Component<ConfigureWifiProps> {
-    
+class ConfigureWifi extends Component<ConfigureWifiProps> {   
     render(){
         if(this.props.shouldRender) { 
             return(
@@ -86,8 +85,6 @@ class ConfigureWifi extends Component<ConfigureWifiProps> {
         }
     }
 }
-
-
 
 function mapStateToProps(state){
     const { BLE } = state

@@ -44,6 +44,7 @@ class StatusStackScreen extends Component {
   }
 }
 
+
 class App extends Component {
   constructor(props){
     super(props)
@@ -55,7 +56,6 @@ class App extends Component {
     console.log("Disconnecting")
     this.props.disconnectDevices();
 }
-
   
   render() {
     return(
@@ -65,7 +65,9 @@ class App extends Component {
               <Tab.Screen name="Map Status" component={HomeScreen} />
               <Tab.Screen name="Connection Status" component={StatusStackScreen} />
             </Tab.Navigator>
-            <Snackbar style={{marginBottom: 60}} duration={3000} visible={this.props.App.snackbarVisible} onDismiss={() => {this.props.hideSnackbar()}}>{this.props.App.snackbarText}</Snackbar>
+            <Snackbar style={{marginBottom: 60}} duration={3000} visible={this.props.App.snackbarVisible} onDismiss={() => {this.props.hideSnackbar()}}>
+              {this.props.App.snackbarText}
+            </Snackbar>
           </NavigationContainer>
         </PaperProvider>
     )

@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 
 import { View, StyleSheet } from 'react-native';
-import { Text, Button, List, Snackbar } from 'react-native-paper';
+import { Text, Button, List } from 'react-native-paper';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import { scanWifi } from '../actions/BLEActions';
 
 import { Base } from '../styles'
@@ -31,25 +30,18 @@ const styles = StyleSheet.create({
 });
 
 class BleDevice extends Component {
-    render(){
-      return(
-          <List.Item 
-            title={this.props.device.name} 
-            key={this.props.i} 
-            description={this.props.device.id} 
-            style={{width: '80%'}} 
-            onPress={() => { this.props.navigation.navigate('Details')}}
-          />
-      )
-    }
+  render(){
+    return(
+        <List.Item 
+          title={this.props.device.name} 
+          key={this.props.i} 
+          description={this.props.device.id} 
+          style={{width: '80%'}} 
+          onPress={() => { this.props.navigation.navigate('Details')}}
+        />
+    )
   }
-
-  // const mapDispatchToProps = dispatch => (
-//     bindActionCreators({
-//         addDevice,
-//         // startScan: () => dispatch(startScan())
-//     }, dispatch)
-// );
+}
 
 function mapStateToProps(state){
     const { BLE, App } = state

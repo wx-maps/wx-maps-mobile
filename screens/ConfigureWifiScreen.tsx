@@ -6,11 +6,25 @@ import { scanWifi, connectToWifi, showConnectDialog, hideConnectDialog } from '.
 import {Item} from '../components/Item'
 const shortid = require('shortid');
 
-import { Base } from '../styles'
+type ConfigureWifiScreenProps = {
+  scanWifi: Function,
+  showConnectDialog: Function,
+  connectToWifi: Function,
+}
 
-class ConfigureWifiScreen extends Component {
+type ConfigureWifiScreenState = {
+  wifiPassword: String,
+}
+
+class ConfigureWifiScreen extends Component<ConfigureWifiScreenProps, ConfigureWifiScreenState> {
+  title: string;
+  
   constructor(props) {
     super(props);
+    this.state = {
+      wifiPassword: ''
+    }
+
     if(this.props.BLE.wifiNetworks.length == 0) { this.props.scanWifi() }
     this.title = 'Select A Network';
   }

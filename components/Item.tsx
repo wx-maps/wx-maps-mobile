@@ -2,8 +2,11 @@ import React, { Component } from 'react';
 import {StyleSheet} from 'react-native';
 import { Card, Title, Caption } from 'react-native-paper';
 
-
-export class Item extends Component {
+type ItemProps = {
+    itemCaption: string,
+    style: Object,
+}
+export class Item extends Component<ItemProps> {
     render() {
         return (<Card style={[styles.statusBox, this.props.style]} {...this.props}>
             <Card.Content style={styles.cardContent}>
