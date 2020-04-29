@@ -70,7 +70,6 @@ export const BLEReducer = (state = INITIAL_STATE, action) => {
     case HIDE_CONNECT_DIALOG:
       return {...state, wifi: { ...state.wifi, connectDialogVisible: false}} 
     case ADD_AIRPORT_DATA:
-      console.log("Payload:", action.payload)
         return {...state, airportDataBuffer: state.airportDataBuffer.concat(action.payload)} 
     default:
       return state

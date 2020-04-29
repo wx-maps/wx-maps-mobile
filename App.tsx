@@ -23,15 +23,15 @@ import ConfigureWifiScreen from './screens/ConfigureWifiScreen';
 
 //
 import * as Styles from './styles'
+import {BLECommunicator} from './lib/BLECommunicator'
 
 
 const BLEManager = new BleManager();
-
+const BleCommunicator = new BLECommunicator();
+const store = createStore(rootReducer, applyMiddleware(thunk.withExtraArgument({BLEManager, BleCommunicator})));
 
 const StatusStack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
-const store = createStore(rootReducer, applyMiddleware(thunk.withExtraArgument(BLEManager)));
-
 
 class StatusStackScreen extends Component {
   render(){
@@ -50,6 +50,7 @@ class App extends Component {
     super(props)
     console.log("Welcome!");
     this.props.startScan();
+    BleCommunicator.setDispatch(store.dispatch)
   }
 
   componentWillUnmount() {
