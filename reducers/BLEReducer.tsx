@@ -1,5 +1,3 @@
-// import { combineReducers } from 'redux';
-
 import { 
   ADD_DEVICE, 
   CONNECTED_DEVICE, 
@@ -10,6 +8,8 @@ import {
   CLEAR_WIFI_DATA,
   SHOW_CONNECT_DIALOG,
   HIDE_CONNECT_DIALOG,
+  RECONSTRUCT_AIRPORT_DATA,
+  ADD_AIRPORT_DATA,
 } from '../actions/BLEActions'
 
 const INITIAL_STATE = {
@@ -19,6 +19,8 @@ const INITIAL_STATE = {
   wifiNetworks: [],
   connectedDevice: null,
   isConnected: false,
+  airportDataBuffer: [],
+  airports: [],
   wifi: { 
     connectedToInternet: false,
     ipAddress: null,
@@ -36,7 +38,8 @@ export const BLEReducer = (state = INITIAL_STATE, action) => {
     case ADD_WIFI_DATA:
       return {...state, wifiDataBuffer: state.wifiDataBuffer.concat(action.payload)}
     case CLEAR_WIFI_DATA:
-      return {...state, wifiDataBuffer: [], wifiNetworkData: []}
+     return {...state, wifiDataBuffer: [], wifiNetworkData: []}
+     // DRY these reconstructs up
     case RECONSTRUCT_DATA:
       let wifiNetworkData = state.wifiDataBuffer.join('');
       try{  
@@ -44,6 +47,16 @@ export const BLEReducer = (state = INITIAL_STATE, action) => {
       } catch {
         console.log('Failed to parse state:')
         console.log(wifiNetworkData)
+        return {...state}
+      }
+    case RECONSTRUCT_AIRPORT_DATA:
+      console.log(state.airportDataBuffer)
+      let data = state.airportDataBuffer.join('');
+      try{  
+        return {...state, airports:  JSON.parse(data) }
+      } catch {
+        console.log('Failed to parse state:')
+        console.log(data)
         return {...state}
       }
     case CONNECTED_DEVICE:
@@ -56,6 +69,9 @@ export const BLEReducer = (state = INITIAL_STATE, action) => {
       return {...state, wifi: { ...state.wifi, connectDialogVisible: true, selectedWifiNetwork: action.payload}}
     case HIDE_CONNECT_DIALOG:
       return {...state, wifi: { ...state.wifi, connectDialogVisible: false}} 
+    case ADD_AIRPORT_DATA:
+      console.log("Payload:", action.payload)
+        return {...state, airportDataBuffer: state.airportDataBuffer.concat(action.payload)} 
     default:
       return state
   }

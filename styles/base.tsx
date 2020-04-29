@@ -17,7 +17,13 @@ export const statusBox = {
     margin: 5, 
     textAlign: 'center', 
 }
+export const airportBox = {
+    flex: 0, 
+    margin: 5, 
+    textAlign: 'center', 
+    padding: 20,
 
+}
 export const statusBoxButton = {
     ...statusBox,
     paddingTop: 40, 

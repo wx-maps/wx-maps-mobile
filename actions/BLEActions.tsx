@@ -9,10 +9,12 @@ export const CONNECTED_DEVICE = 'CONNECTED_DEVICE'
 export const ADD_WIFI_DATA = 'ADD_WIFI_DATA'
 export const CLEAR_WIFI_DATA = 'CLEAR_WIFI_DATA'
 export const RECONSTRUCT_DATA = 'RECONSTRUCT_DATA'
+export const RECONSTRUCT_AIRPORT_DATA = 'RECONSTRUCT_AIRPORT_DATA'
 export const SET_IP_ADDRESS = 'SET_IP_ADDRESS'
 export const SET_INTERNET_CONNECTION_STATUS = 'SET_INTERNET_CONNECTION_STATUS'
 export const SHOW_CONNECT_DIALOG = 'SHOW_CONNECT_DIALOG'
 export const HIDE_CONNECT_DIALOG = 'HIDE_CONNECT_DIALOG'
+export const ADD_AIRPORT_DATA = 'ADD_AIRPORT_DATA'
 
 /*
  *
@@ -55,6 +57,13 @@ export const reconstructData = () => (
     }
 )
 
+export const reconstructAirportData = () => (
+    {
+        type: RECONSTRUCT_AIRPORT_DATA,
+        payload: null,
+    }
+)
+
 export const setIPAddress = (value) => (
     {
         type: SET_IP_ADDRESS,
@@ -79,6 +88,13 @@ export const hideConnectDialog = () => (
 export const setInternetConnectionStatus = (value) => (
     {
         type: SET_INTERNET_CONNECTION_STATUS,
+        payload: value,
+    }
+)
+
+export const addAirportData = (value) => (
+    {
+        type: ADD_AIRPORT_DATA,
         payload: value,
     }
 )
@@ -116,11 +132,8 @@ export const scanWifi = () => {
             })
         } catch(error){
             console.log('Error:')
-            console.log(error)
-
-            
+            console.log(error)   
         }
-        
     }
 }
     
@@ -161,11 +174,13 @@ export const connectTo = (device) => {
               dispatch(App.showConnectedSnackbar(device));
             return device.discoverAllServicesAndCharacteristics();
           })
-          .then((device) => {
+          .then(async (device) => {
                 console.log('Subscribing')
                 updateRSSI(device);
                 dispatch(readIPAddress(device))
                 dispatch(readInternetStatus(device))
+                dispatch(readWeatherData(device))
+
 
 
                 // FIXME - Break out subscriptions
@@ -183,11 +198,28 @@ export const connectTo = (device) => {
                         }
                     }
                 });
+                console.log("Subscribing wx")
+                await device.monitorCharacteristicForService(BLE.MAP_SERVICE, BLE.WEATHER_DATA_CHARACTERISTIC, (error, characteristic) => {
+                    if (characteristic && !error) {
+                        const data = decode(characteristic.value);
+                        console.log("Data wx:" + data)
+
+                        if (data.slice(-1) == "\0") {
+                            console.log("Got terminator")
+                            dispatch(addAirportData(data.slice(0, -1)))
+                            dispatch(reconstructAirportData())
+                        } else {
+                            dispatch(addAirportData(data));
+                        }
+                    }
+                })
+                
                 
                 return device
           }, (error) => {
             // this.setState({ status: error.message });
           })
+          .then((device) => { console.log('reading wx'); dispatch(readWeatherData(device)) })
           .catch((error) => {
             device.cancelConnection();
             console.log(error);
@@ -261,6 +293,12 @@ const readInternetStatus = (device) => {
         .then((data) => {
             dispatch(setInternetConnectionStatus(decode(data.value)))
         })
+    }
+}
+
+const readWeatherData = (device) => {
+    return (dispatch, getState, BLEManager) => {
+        getState().BLE.connectedDevice.writeCharacteristicWithResponseForService(BLE.MAP_SERVICE, BLE.WEATHER_DATA_CHARACTERISTIC, encode('1'))
     }
 }
 // function reconstructData() {

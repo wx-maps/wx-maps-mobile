@@ -7,11 +7,18 @@ type ItemProps = {
     style: Object,
 }
 export class Item extends Component<ItemProps> {
+    caption(){
+        if(this.props.itemCaption){
+            return(<Caption style={[styles.centered, this.props.style]}>{this.props.itemCaption}</Caption>)
+        }else{
+            return null;
+        }
+    }
     render() {
         return (<Card style={[styles.statusBox, this.props.style]} {...this.props}>
             <Card.Content style={styles.cardContent}>
                 <Title style={[styles.centered, this.props.style]}>{this.props.children}</Title>
-                <Caption style={[styles.centered, this.props.style]}>{this.props.itemCaption}</Caption>
+                {this.caption()}
             </Card.Content>
         </Card>);
     }

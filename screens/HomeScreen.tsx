@@ -1,11 +1,19 @@
 import React, { Component } from 'react';
 
-import { View, StyleSheet } from 'react-native';
-import { Text, Button, List } from 'react-native-paper';
+import { SafeAreaView, ScrollView, View } from 'react-native';
+import { Headline, List } from 'react-native-paper';
 import { connect } from 'react-redux';
 import { scanWifi } from '../actions/BLEActions';
 
-import { Base } from '../styles'
+import {Item} from '../components/Item';
+
+import * as Styles from '../styles'
+
+import {Base} from '../styles'
+import { RefreshControlBase } from 'react-native';
+
+const shortid = require('shortid');
+
 require("json-circular-stringify");
 
 class HomeScreen extends Component {
@@ -14,33 +22,22 @@ class HomeScreen extends Component {
     }
 
     render() {
-        return (<View style={styles.container}>
-          <Text>Device count: {this.props.BLE.devices.length}</Text>
-            {this.props.BLE.devices.map((device, i) => { return <BleDevice device={device} key={i} navigation={this.props.navigation} manager={this.manager} />; })}
-            <Text>Connected Device: { this.props.BLE.connectedDevice && this.props.BLE.connectedDevice.name }</Text>
+      if(!this.props.BLE.airports) { return null }
 
-            <Button onPress={() => this.props.navigation.navigate('Details')}>Go To Details</Button>
-            <Button onPress={() => this.props.scanWifi()}>Scan</Button>
-        </View>);
+        return (
+          <SafeAreaView style={{height: '100%'}}>
+            <ScrollView>
+              <View style={Styles.Base.statusBoxContainer}>                     
+                  {
+                    this.props.BLE.airports.map((airport) => { 
+                      return(<Item key={shortid.generate()} style={[Styles.Base.airportBox, Styles.Colors[airport.flightCategory]]}>{airport.name}</Item>)
+                    })
+                  }
+                </View>
+            </ScrollView>
+          </SafeAreaView>
+        );
     }
-}
-
-const styles = StyleSheet.create({
-    container: { ...Base.container }
-});
-
-class BleDevice extends Component {
-  render(){
-    return(
-        <List.Item 
-          title={this.props.device.name} 
-          key={this.props.i} 
-          description={this.props.device.id} 
-          style={{width: '80%'}} 
-          onPress={() => { this.props.navigation.navigate('Details')}}
-        />
-    )
-  }
 }
 
 function mapStateToProps(state){
