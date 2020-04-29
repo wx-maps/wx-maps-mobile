@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { SafeAreaView, ScrollView, View } from 'react-native';
+import { SafeAreaView, ScrollView, View, Text } from 'react-native';
 import { Headline, List } from 'react-native-paper';
 import { connect } from 'react-redux';
 import { scanWifi } from '../actions/BLEActions';
@@ -27,10 +27,13 @@ class HomeScreen extends Component {
         return (
           <SafeAreaView style={{height: '100%'}}>
             <ScrollView>
-              <View style={Styles.Base.statusBoxContainer}>                     
+              <View style={Styles.Base.airportBoxContainer}>                     
                   {
                     this.props.BLE.airports.map((airport) => { 
-                      return(<Item key={shortid.generate()} style={[Styles.Base.airportBox, Styles.Colors[airport.flightCategory]]}>{airport.name}</Item>)
+                      return(
+                        <Item key={shortid.generate()} style={[Styles.Base.airportBox, Styles.Colors[airport.flightCategory]]}>
+                          <Text style={Styles.Base.airportBoxText}>{airport.name}</Text>
+                        </Item>)
                     })
                   }
                 </View>

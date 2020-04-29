@@ -9,7 +9,7 @@ export const ADD_DEVICE = 'ADD_DEVICE'
 export const CONNECTED_DEVICE = 'CONNECTED_DEVICE'
 export const ADD_WIFI_DATA = 'ADD_WIFI_DATA'
 export const CLEAR_WIFI_DATA = 'CLEAR_WIFI_DATA'
-export const RECONSTRUCT_DATA = 'RECONSTRUCT_DATA'
+export const RECONSTRUCT_WIFI_DATA = 'RECONSTRUCT_DATA'
 export const RECONSTRUCT_AIRPORT_DATA = 'RECONSTRUCT_AIRPORT_DATA'
 export const SET_IP_ADDRESS = 'SET_IP_ADDRESS'
 export const SET_INTERNET_CONNECTION_STATUS = 'SET_INTERNET_CONNECTION_STATUS'
@@ -51,9 +51,9 @@ export const clearWifiData = () => (
     }
 )
 
-export const reconstructData = () => (
+export const reconstructWifiData = () => (
     {
-        type: RECONSTRUCT_DATA,
+        type: RECONSTRUCT_WIFI_DATA,
         payload: null,
     }
 )

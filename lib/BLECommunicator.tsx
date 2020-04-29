@@ -12,7 +12,7 @@ import {
     readWeatherData,
     addWifiData,
     addAirportData,
-    reconstructData,
+    reconstructWifiData,
     reconstructAirportData,
     clearWifiData,
     disconnected,
@@ -25,16 +25,6 @@ import * as MapService from './BLECommunicator/MapService'
 import * as WifiService from './BLECommunicator/WifiService'
 
 
-// export const MapService.UUID                          = 'a5023bbe-29f9-4385-ab43-a9b3600ab7c4'
-// export const IP_CHARACTERISTIC                    = '7d17ff43-b02a-4586-a488-5a7fd0bc8856'
-// export const WEATHER_DATA_CHARACTERISTIC          = '8dc27e53-225f-40a5-a198-b401b7786a5b'
-
-
-// export const WifiService  WifiService.                       = 'ed6695dd-be8a-44d6-a11d-cb3348faa85a'
-// export const SCAN_CHARACTERISTIC                  = 'fe600987-e2ea-4c16-b938-f5d04e904af2'
-// export const CONNECTED_TO_INTERNET_CHARACTERISTIC = '544eb8bb-c6ba-4e94-b2e9-581855102634'
-// export const CONNECTION_CHARACTERISTIC            = 'b4a7d251-7467-440c-9bf8-570f1fbc929f'
-
 export class BLECommunicator {
     manager: BleManager
     dispatch: Function
@@ -42,7 +32,6 @@ export class BLECommunicator {
     constructor(){
         this.manager = new BleManager();
         this.dispatch = null;
-        console.log('UUID:', Map.UUID)
     }
 
     /************************************
@@ -50,19 +39,11 @@ export class BLECommunicator {
      *  Utilities
      * 
      *************************************/
-    encode(data: string) {
-        return new Buffer(data).toString('base64');
-    }
+    encode(data: string) { return new Buffer(data).toString('base64'); }
 
-     decode = (value: string) => {
-        console.log('UUID:', Map.UUID)
-
-        return new Buffer(value, 'base64').toString('utf8');
-    }
+    decode = (value: string) => { return new Buffer(value, 'base64').toString('utf8'); }
     
-    setDispatch(dispatch: Function){
-        this.dispatch = dispatch;
-    }
+    setDispatch(dispatch: Function){ this.dispatch = dispatch; }
 
     /************************************
      *
@@ -132,36 +113,27 @@ export class BLECommunicator {
 
     subscribeToWifiScanResults(device){
         device.monitorCharacteristicForService(WifiService.UUID, WifiService.SCAN_CHARACTERISTIC, (error, characteristic) => {
-            if (characteristic && !error) {
-                const data = this.decode(characteristic.value);
-                console.log("Data:" + data)
-
-                if (data.slice(-1) == "\0") {
-                    console.log("Got terminator")
-                    this.dispatch(addWifiData(data.slice(0, -1)))
-                    this.dispatch(reconstructData())
-                } else {
-                    this.dispatch(addWifiData(data));
-                }
-            }
-        });
+            this.rxData(error, characteristic, addWifiData, reconstructWifiData)
+        })
     }
 
     subscribeToWeatherData(device){
         device.monitorCharacteristicForService(MapService.UUID, MapService.WEATHER_DATA_CHARACTERISTIC, (error, characteristic) => {
-            if (characteristic && !error) {
-                const data = this.decode(characteristic.value);
-                console.log("Data wx:" + data)
-
-                if (data.slice(-1) == "\0") {
-                    console.log("Got terminator")
-                    this.dispatch(addAirportData(data.slice(0, -1)))
-                    this.dispatch(reconstructAirportData())
-                } else {
-                    this.dispatch(addAirportData(data));
-                }
-            }
+            this.rxData(error, characteristic, addAirportData, reconstructAirportData)
         })
+    }
+
+    rxData(error, characteristic, collector: Function, assembler: Function){
+        if (characteristic && !error) {
+            const data = this.decode(characteristic.value);
+            if (data.slice(-1) == "\0") {
+                console.log("Got terminator")
+                this.dispatch(collector(data.slice(0, -1)))
+                this.dispatch(assembler())
+            } else {
+                this.dispatch(collector(data));
+            }
+        }
     }
 
     // Wifi stuff

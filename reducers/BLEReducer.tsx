@@ -2,7 +2,7 @@ import {
   ADD_DEVICE, 
   CONNECTED_DEVICE, 
   ADD_WIFI_DATA, 
-  RECONSTRUCT_DATA, 
+  RECONSTRUCT_WIFI_DATA, 
   SET_IP_ADDRESS, 
   SET_INTERNET_CONNECTION_STATUS, 
   CLEAR_WIFI_DATA,
@@ -40,7 +40,7 @@ export const BLEReducer = (state = INITIAL_STATE, action) => {
     case CLEAR_WIFI_DATA:
      return {...state, wifiDataBuffer: [], wifiNetworkData: []}
      // DRY these reconstructs up
-    case RECONSTRUCT_DATA:
+    case RECONSTRUCT_WIFI_DATA:
       let wifiNetworkData = state.wifiDataBuffer.join('');
       try{  
         return {...state, wifiNetworks:  JSON.parse(wifiNetworkData) }
