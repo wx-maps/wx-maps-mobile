@@ -19,6 +19,7 @@ import {
     setIPAddress,
     hideConnectDialog,
     setInternetConnectionStatus,
+    updateStatusString,
 } from '../actions/BLEActions'
 
 import * as MapService from './BLECommunicator/MapService'
@@ -76,28 +77,25 @@ export class BLECommunicator {
         console.log("Connecting to device " + device.id)
         this.manager.stopDeviceScan();
         device.connect()
-          .then((device) => {
-              this.dispatch(connectedDevice(device))
-              this.dispatch(AppActions.showConnectedSnackbar(device));
-            return device.discoverAllServicesAndCharacteristics();
-          })
-          .then(async (device) => {
+            .then((device) => {
+                this.dispatch(connectedDevice(device))
+                this.dispatch(AppActions.showConnectedSnackbar(device));
+                this.dispatch(updateStatusString("Connected!\nFetching weather data..."))
+                return device.discoverAllServicesAndCharacteristics();
+            })
+            .then(async (device) => {
                 console.log('Subscribing')
                 // this.updateRSSI(device);
                 this.subscribeToServices(device);
                 return device
-          }, (error) => {
-            // this.setState({ status: error.message });
-          })
-          .then((device) => { 
+            }, (error) => {
+                // this.setState({ status: error.message });
+            })
+            .then((device) => { 
                 this.dispatch(readWeatherData(device)) 
                 this.dispatch(readIPAddress(device))
                 this.dispatch(readInternetStatus(device))
             })
-          .catch((error) => {
-            device.cancelConnection();
-            console.log(error);
-          });
     }
     
     disconnectDevices(){
@@ -115,21 +113,27 @@ export class BLECommunicator {
         device.monitorCharacteristicForService(WifiService.UUID, WifiService.SCAN_CHARACTERISTIC, (error, characteristic) => {
             this.rxData(error, characteristic, addWifiData, reconstructWifiData)
         })
+
     }
 
     subscribeToWeatherData(device){
         device.monitorCharacteristicForService(MapService.UUID, MapService.WEATHER_DATA_CHARACTERISTIC, (error, characteristic) => {
             this.rxData(error, characteristic, addAirportData, reconstructAirportData)
         })
+
     }
 
+    // Receives larger amounts of data from the BLE connection. 
+    // The server sends data in 20 byte chunks that we shover into $collector
+    // When the transmission is complete the server appends a null terrminator
+    // which then signals us we can reassemble the data using $assembler
     rxData(error, characteristic, collector: Function, assembler: Function){
         if (characteristic && !error) {
             const data = this.decode(characteristic.value);
             if (data.slice(-1) == "\0") {
-                console.log("Got terminator")
                 this.dispatch(collector(data.slice(0, -1)))
                 this.dispatch(assembler())
+                console.log("RX/Assembling BLE Data")
             } else {
                 this.dispatch(collector(data));
             }

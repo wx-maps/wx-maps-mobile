@@ -1,16 +1,13 @@
 import React, { Component } from 'react';
 
 import { SafeAreaView, ScrollView, View, Text } from 'react-native';
-import { Headline, List } from 'react-native-paper';
 import { connect } from 'react-redux';
 import { scanWifi } from '../actions/BLEActions';
 
 import {Item} from '../components/Item';
 
 import * as Styles from '../styles'
-
-import {Base} from '../styles'
-import { RefreshControlBase } from 'react-native';
+import LoadingIndicator from '../components/LoadingIndicator';
 
 const shortid = require('shortid');
 
@@ -21,25 +18,32 @@ class HomeScreen extends Component {
         super(props)
     }
 
-    render() {
-      if(!this.props.BLE.airports) { return null }
+    isLoading(){ return this.props.BLE.airports.length <= 0 }
 
+    render() {
+      if(this.isLoading()){
+        return(<LoadingIndicator />)
+      }else{
         return (
-          <SafeAreaView style={{height: '100%'}}>
-            <ScrollView>
-              <View style={Styles.Base.airportBoxContainer}>                     
-                  {
-                    this.props.BLE.airports.map((airport) => { 
-                      return(
-                        <Item key={shortid.generate()} style={[Styles.Base.airportBox, Styles.Colors[airport.flightCategory]]}>
-                          <Text style={Styles.Base.airportBoxText}>{airport.name}</Text>
-                        </Item>)
-                    })
-                  }
-                </View>
+          <SafeAreaView style={{flex: 1}}>
+            <ScrollView contentContainerStyle={{flexGrow: 1}}>
+            
+
+              <View style={[Styles.Base.airportBoxContainer, {alignItems: 'center', justifyContent: 'center'}]}>   
+      
+                {
+                  this.props.BLE.airports.map((airport) => { 
+                    return(
+                      <Item key={shortid.generate()} style={[Styles.Base.airportBox, Styles.Colors[airport.flightCategory]]}>
+                        <Text style={Styles.Base.airportBoxText}>{airport.name}</Text>
+                      </Item>)
+                  })
+                }
+              </View>
             </ScrollView>
           </SafeAreaView>
         );
+      }
     }
 }
 

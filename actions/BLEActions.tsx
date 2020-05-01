@@ -16,6 +16,7 @@ export const SET_INTERNET_CONNECTION_STATUS = 'SET_INTERNET_CONNECTION_STATUS'
 export const SHOW_CONNECT_DIALOG = 'SHOW_CONNECT_DIALOG'
 export const HIDE_CONNECT_DIALOG = 'HIDE_CONNECT_DIALOG'
 export const ADD_AIRPORT_DATA = 'ADD_AIRPORT_DATA'
+export const UPDATE_STATUS_STRING ='UPDATE_STATUS_STRING'
 
 /*
  *
@@ -96,6 +97,13 @@ export const setInternetConnectionStatus = (value) => (
 export const addAirportData = (value) => (
     {
         type: ADD_AIRPORT_DATA,
+        payload: value,
+    }
+)
+
+export const updateStatusString = (value) => (
+    {
+        type: UPDATE_STATUS_STRING,
         payload: value,
     }
 )

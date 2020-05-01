@@ -10,6 +10,7 @@ import {
   HIDE_CONNECT_DIALOG,
   RECONSTRUCT_AIRPORT_DATA,
   ADD_AIRPORT_DATA,
+  UPDATE_STATUS_STRING,
 } from '../actions/BLEActions'
 
 const INITIAL_STATE = {
@@ -21,6 +22,8 @@ const INITIAL_STATE = {
   isConnected: false,
   airportDataBuffer: [],
   airports: [],
+  lightsOn: true,
+  statusString: "Searching for WX Map",
   wifi: { 
     connectedToInternet: false,
     ipAddress: null,
@@ -41,7 +44,7 @@ export const BLEReducer = (state = INITIAL_STATE, action) => {
      return {...state, wifiDataBuffer: [], wifiNetworkData: []}
      // DRY these reconstructs up
     case RECONSTRUCT_WIFI_DATA:
-      let wifiNetworkData = state.wifiDataBuffer.join('');
+      const wifiNetworkData = state.wifiDataBuffer.join('');
       try{  
         return {...state, wifiNetworks:  JSON.parse(wifiNetworkData) }
       } catch {
@@ -50,13 +53,13 @@ export const BLEReducer = (state = INITIAL_STATE, action) => {
         return {...state}
       }
     case RECONSTRUCT_AIRPORT_DATA:
-      console.log(state.airportDataBuffer)
-      let data = state.airportDataBuffer.join('');
+      const airportWeatherData = state.airportDataBuffer.join('');
       try{  
-        return {...state, airports:  JSON.parse(data) }
+        const data = JSON.parse(airportWeatherData)
+        return {...state, airportDataBuffer: [], airports: data }
       } catch {
         console.log('Failed to parse state:')
-        console.log(data)
+        console.log(airportWeatherData)
         return {...state}
       }
     case CONNECTED_DEVICE:
@@ -70,7 +73,9 @@ export const BLEReducer = (state = INITIAL_STATE, action) => {
     case HIDE_CONNECT_DIALOG:
       return {...state, wifi: { ...state.wifi, connectDialogVisible: false}} 
     case ADD_AIRPORT_DATA:
-        return {...state, airportDataBuffer: state.airportDataBuffer.concat(action.payload)} 
+        return {...state, airportDataBuffer: state.airportDataBuffer.concat(action.payload)}
+    case UPDATE_STATUS_STRING:
+      return{...state, statusString: action.payload}
     default:
       return state
   }

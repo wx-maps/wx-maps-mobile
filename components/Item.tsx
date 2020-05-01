@@ -27,6 +27,5 @@ export class Item extends Component<ItemProps> {
 }
 
 export const styles = StyleSheet.create({
-    // cardContent: {paddingHorizontal: 5, paddingVertical: 5},
     centered: {textAlign: 'center', alignItems: 'center'},
 })
