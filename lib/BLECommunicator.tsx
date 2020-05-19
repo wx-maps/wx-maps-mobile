@@ -197,15 +197,20 @@ export class BLECommunicator {
     
     // Weather stuff
     readWeatherData(connectedDevice){
-        connectedDevice.writeCharacteristicWithResponseForService(MapService.UUID, MapService.WEATHER_DATA_CHARACTERISTIC, this.encode('1'))
+        this.write(connectedDevice, MapService.UUID, MapService.WEATHER_DATA_CHARACTERISTIC, '1')
     }
 
     // Mode stuff
     setRainbowMode(connectedDevice){
-        connectedDevice.writeCharacteristicWithResponseForService(MapService.UUID, MapService.MODE_CHARACTERISTIC, this.encode('rainbow'))
+        this.write(connectedDevice, MapService.UUID, MapService.MODE_CHARACTERISTIC, 'rainbow')
     }
 
     setMetarMode(connectedDevice){
-        connectedDevice.writeCharacteristicWithResponseForService(MapService.UUID, MapService.MODE_CHARACTERISTIC, this.encode('metar'))
+        this.write(connectedDevice, MapService.UUID, MapService.MODE_CHARACTERISTIC, 'metar')
+    }
+
+    write(connectedDevice, service, characteristic, value){
+        connectedDevice.writeCharacteristicWithResponseForService(service, characteristic, this.encode(value))
+
     }
 }
