@@ -6,7 +6,6 @@ import { connect } from 'react-redux';
 class LoadingIndicator extends Component {
   // Should show some extra context eg searching, connecting, loading etc
   render() {
-    console.log('props', this.props);
     return (<SafeAreaView style={{ flex: 1 }}>
 
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>

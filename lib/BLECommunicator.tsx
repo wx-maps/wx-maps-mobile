@@ -85,6 +85,7 @@ export class BLECommunicator {
             })
             .then(async (device) => {
                 console.log('Subscribing')
+                console.log(device)
                 // this.updateRSSI(device);
                 this.subscribeToServices(device);
                 return device
@@ -197,5 +198,14 @@ export class BLECommunicator {
     // Weather stuff
     readWeatherData(connectedDevice){
         connectedDevice.writeCharacteristicWithResponseForService(MapService.UUID, MapService.WEATHER_DATA_CHARACTERISTIC, this.encode('1'))
+    }
+
+    // Mode stuff
+    setRainbowMode(connectedDevice){
+        connectedDevice.writeCharacteristicWithResponseForService(MapService.UUID, MapService.MODE_CHARACTERISTIC, this.encode('rainbow'))
+    }
+
+    setMetarMode(connectedDevice){
+        connectedDevice.writeCharacteristicWithResponseForService(MapService.UUID, MapService.MODE_CHARACTERISTIC, this.encode('metar'))
     }
 }

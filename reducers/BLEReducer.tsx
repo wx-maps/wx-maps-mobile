@@ -60,7 +60,7 @@ export const BLEReducer = (state = INITIAL_STATE, action) => {
       } catch {
         console.log('Failed to parse state:')
         console.log(airportWeatherData)
-        return {...state}
+        return {...state, airportDataBuffer: []}
       }
     case CONNECTED_DEVICE:
       return {...state, connectedDevice: action.payload, isConnected: true}

@@ -1,5 +1,3 @@
-import {HIDE_SNACKBAR, SHOW_SNACKBAR} from '../actions/AppActions'
-
 const INITIAL_STATE = {
     lightsOn: true,
 };
